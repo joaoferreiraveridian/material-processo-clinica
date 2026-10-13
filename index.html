@@ -1,0 +1,916 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Como a clínica funciona por dentro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --floresta:#10241C; --pinho:#1C4034; --musgo:#2d6a53; --perg:#EFE9DB; --perg2:#F8F4EA; --papel:#FFFDF7;
+  --ouro:#C9A227; --ouro-claro:#E7D58F; --vinho:#7A3325; --vinho-claro:#F3E3DD;
+  --txt:#10241C; --suave:#56675e; --linha:rgba(16,36,28,.12); --linha2:rgba(16,36,28,.2);
+  --verm:#B23A2B; --azul:#2F6DB5;
+  --sombra:0 1px 0 rgba(255,255,255,.7) inset,0 10px 28px -18px rgba(16,36,28,.35);
+  --sombra-alta:0 1px 0 rgba(255,255,255,.7) inset,0 18px 36px -18px rgba(16,36,28,.45);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;overflow-anchor:none}
+body,.panel,.wrap{overflow-anchor:none}
+body{margin:0;color:var(--txt);font-family:Inter,system-ui,sans-serif;font-size:15px;line-height:1.6;
+  background:radial-gradient(1200px 500px at 85% -10%,rgba(201,162,39,.10),transparent 60%),var(--perg);-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;font-weight:300;letter-spacing:-.015em;margin:0;line-height:1.15}
+h2{font-size:clamp(28px,4.2vw,40px);margin-bottom:8px}
+h3{font-size:20px;margin-bottom:8px}
+p{margin:0 0 10px}
+b{font-weight:600}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--ouro);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+.muted{color:var(--suave);font-size:14px}
+.lead{font-size:17px;color:var(--suave);max-width:700px;margin-bottom:18px}
+.s{font-size:12px;margin-left:3px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.bar{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:14px 0 6px}
+
+/* ===== topo ===== */
+.hero{position:relative;background:var(--floresta);color:var(--perg);padding:52px 0 34px;overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(700px 360px at 90% 0%,rgba(28,64,52,.95),transparent 70%),
+  radial-gradient(500px 300px at 0% 100%,rgba(201,162,39,.12),transparent 70%)}
+.hero::after{content:"";position:absolute;inset:0;opacity:.05;background-image:linear-gradient(var(--perg) 1px,transparent 1px),linear-gradient(90deg,var(--perg) 1px,transparent 1px);background-size:44px 44px;mask-image:linear-gradient(180deg,#000,transparent 85%);-webkit-mask-image:linear-gradient(180deg,#000,transparent 85%)}
+.hero .wrap{position:relative;z-index:1}
+.hero .tag0{display:inline-block;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ouro);border:1px solid rgba(201,162,39,.4);padding:4px 12px;border-radius:999px;margin-bottom:16px}
+.hero h1{font-size:clamp(36px,6.2vw,62px);max-width:780px}
+.hero h1 em{color:var(--ouro);font-style:italic;font-weight:300}
+.hero .sub{color:#bdb6a3;max-width:600px;margin:14px 0 0;font-size:16px}
+.route{display:flex;justify-content:space-between;position:relative;margin:38px 0 10px}
+.route::before{content:"";position:absolute;left:6.25%;right:6.25%;top:17px;height:2px;background:rgba(239,233,219,.14);border-radius:2px}
+.rfill{position:absolute;left:5.5%;top:17px;height:2px;background:linear-gradient(90deg,var(--musgo),var(--ouro));border-radius:2px;transition:width 1.1s cubic-bezier(.6,0,.2,1);width:0}
+.stn{position:relative;z-index:1;text-align:center;flex:1;font-size:12px;color:#8fa498;transition:color .4s}
+.stn i{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;background:var(--floresta);border:2px solid rgba(239,233,219,.2);margin:0 auto 8px;font-style:normal;font-size:12px;font-weight:600;transition:all .5s}
+.stn.on{color:var(--perg)}
+.stn.on i{background:var(--ouro);border-color:var(--ouro);color:var(--floresta);transform:scale(1.15);box-shadow:0 0 0 0 rgba(201,162,39,.5);animation:pulse 1.8s infinite}
+.stn.done i{background:var(--musgo);border-color:var(--musgo);color:var(--perg)}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(201,162,39,.5)}80%,100%{box-shadow:0 0 0 14px rgba(201,162,39,0)}}
+.cap{min-height:26px;color:var(--perg);font-size:15px;transition:opacity .3s}
+.cap b{color:var(--ouro)}
+@media(max-width:600px){.stn span{display:none}.stn i{width:28px;height:28px}.route::before,.rfill{top:14px}}
+
+/* ===== abas ===== */
+.tabs{position:sticky;top:0;z-index:30;background:rgba(239,233,219,.88);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--linha)}
+.tabs .in{position:relative;display:flex;gap:2px;overflow-x:auto;padding:10px 20px;max-width:1080px;margin:0 auto;scrollbar-width:none}
+.tabs .in::-webkit-scrollbar{display:none}
+.tab{position:relative;z-index:1;flex:none;border:0;background:transparent;color:var(--suave);padding:8px 14px;border-radius:999px;font-size:14px;font-weight:500;transition:color .3s}
+.tab:hover{color:var(--txt)}
+.tab.on{color:var(--perg)}
+#ind{position:absolute;z-index:0;left:0;top:10px;height:36px;border-radius:999px;background:var(--floresta);box-shadow:0 6px 16px -8px rgba(16,36,28,.6);transition:transform .45s cubic-bezier(.5,0,.1,1),width .45s cubic-bezier(.5,0,.1,1)}
+
+/* ===== painéis ===== */
+.panel{display:none;padding:34px 0 80px}
+.panel.on{display:block}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--vinho);font-weight:600;margin-bottom:10px}
+.eyebrow::before{content:"";width:22px;height:1px;background:var(--ouro)}
+.eyebrow i{font-style:normal;color:var(--ouro)}
+.rv{opacity:0;transform:translateY(14px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.rv.in{opacity:1;transform:none}
+.up{animation:up .55s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
+@keyframes up{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes swap{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.swap{animation:swap .4s cubic-bezier(.2,.7,.2,1) both}
+
+.card{background:var(--perg2);border:1px solid var(--linha);border-radius:16px;padding:20px;margin:16px 0;box-shadow:var(--sombra)}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr))}
+.grid>*{min-width:0}
+.grid .card{margin:0;transition:transform .3s,box-shadow .3s,border-color .3s}
+.grid .card:hover{transform:translateY(-3px);box-shadow:var(--sombra-alta);border-color:var(--linha2)}
+.two{display:grid;gap:14px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.two>*{min-width:0}
+@media(max-width:760px){.two{grid-template-columns:minmax(0,1fr)}}
+.warn{background:linear-gradient(135deg,#f7edd2,#f3e6c0);border:1px solid rgba(201,162,39,.45);border-radius:14px;padding:14px 16px;margin:16px 0}
+.pain,.sys{border-radius:14px;padding:14px 16px;position:relative;overflow-wrap:anywhere}
+.pain{background:var(--vinho-claro);border:1px solid rgba(122,51,37,.18)}
+.sys{background:#E1EBE5;border:1px solid rgba(28,64,52,.18)}
+.pain b,.sys b{display:flex;align-items:center;gap:8px;font-size:11px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px}
+.pain b::before,.sys b::before{content:"";width:8px;height:8px;border-radius:50%}
+.pain b{color:var(--vinho)}.pain b::before{background:var(--vinho)}
+.sys b{color:var(--pinho)}.sys b::before{background:var(--musgo)}
+
+/* controles */
+.btn{border:1px solid var(--floresta);background:var(--floresta);color:var(--perg);padding:8px 16px;border-radius:10px;font-size:14px;font-weight:500;transition:all .25s;min-height:38px}
+.btn:hover{background:var(--pinho);transform:translateY(-1px)}
+.btn:active{transform:none}
+.btn.alt{background:transparent;color:var(--floresta);border-color:var(--linha2)}
+.btn.alt:hover{background:rgba(16,36,28,.06);border-color:var(--floresta)}
+.btn[disabled]{opacity:.35;pointer-events:none}
+.seg{display:inline-flex;background:rgba(16,36,28,.07);border-radius:12px;padding:4px;gap:2px}
+.seg button{border:0;background:transparent;padding:7px 16px;border-radius:9px;font-size:14px;font-weight:500;color:var(--suave);transition:all .25s}
+.seg button.on{background:var(--floresta);color:var(--perg);box-shadow:0 4px 12px -6px rgba(16,36,28,.6)}
+.chip{display:inline-block;font-size:12px;padding:3px 10px;border-radius:999px;background:rgba(16,36,28,.06);color:var(--suave)}
+.tag{display:inline-block;font-size:11px;padding:3px 10px;border-radius:999px;font-weight:600;letter-spacing:.02em}
+.t-ok{background:#cfe0d6;color:#1C4034}.t-pl{background:#ede0aa;color:#6b5510}.t-fa{background:#f1d3cb;color:var(--vinho)}.t-cf{background:#e4e1d8;color:#4a4a44}
+input[type=number],input[type=text],input[type=search],select{font:inherit;font-size:15px;padding:9px 12px;border:1px solid var(--linha2);border-radius:10px;background:var(--papel);width:100%;transition:border-color .2s,box-shadow .2s}
+input:focus,select:focus{outline:none;border-color:var(--ouro);box-shadow:0 0 0 3px rgba(201,162,39,.22)}
+label{font-size:13px;color:var(--suave);font-weight:500}
+label input{margin-top:4px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:6px;background:rgba(16,36,28,.14);outline:none;margin:16px 0 8px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--floresta);border:3px solid var(--ouro);cursor:pointer;box-shadow:0 4px 10px -3px rgba(16,36,28,.5)}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--floresta);border:3px solid var(--ouro);cursor:pointer}
+label.chk{display:flex;gap:10px;align-items:flex-start;padding:7px 0;cursor:pointer;font-size:14px;color:var(--txt);font-weight:400}
+label.chk input{-webkit-appearance:none;appearance:none;flex:none;width:20px;height:20px;margin:1px 0 0;border:1.5px solid var(--linha2);border-radius:6px;background:var(--papel);position:relative;cursor:pointer;transition:all .2s;padding:0}
+label.chk input:checked{background:var(--floresta);border-color:var(--floresta)}
+label.chk input:checked::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;border:solid var(--ouro);border-width:0 2px 2px 0;transform:rotate(45deg)}
+
+/* ===== stats ===== */
+.stats{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));margin-top:14px}
+.stat{background:var(--papel);border:1px solid var(--linha);border-radius:14px;padding:14px 16px;border-left:4px solid var(--pinho);min-width:0}
+.stat.bad{border-left-color:var(--vinho)}
+.stat.gold{border-left-color:var(--ouro)}
+.sl{font-size:12px;color:var(--suave);margin-bottom:2px}
+.sv{font-family:Fraunces,Georgia,serif;font-size:28px;font-weight:300;font-variant-numeric:tabular-nums;white-space:nowrap}
+.stat.bad .sv{color:var(--vinho)}
+
+/* ===== jornada ===== */
+.trkw{overflow-x:auto;padding:10px 0 8px;scrollbar-width:none;-ms-overflow-style:none;margin:0 -4px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 28px,#000 calc(100% - 28px),transparent 100%)}
+.trkw::-webkit-scrollbar{display:none}
+.trk{position:relative;display:flex;min-width:max-content;padding:8px 30px 0}
+.trk::before{content:"";position:absolute;left:76px;right:76px;top:27px;height:2px;background:var(--linha2);border-radius:2px}
+.pg{position:absolute;left:48px;top:27px;height:2px;background:linear-gradient(90deg,var(--musgo),var(--ouro));border-radius:2px;transition:width .6s cubic-bezier(.6,0,.2,1);width:0}
+.nd{position:relative;z-index:1;width:92px;flex:none;text-align:center;background:none;border:0;font-size:12px;line-height:1.25;color:var(--suave);padding:0 3px;transition:color .3s}
+.nd i{display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:var(--perg2);border:2px solid var(--linha2);margin:0 auto 8px;font-style:normal;font-weight:600;font-size:13px;transition:all .35s}
+.nd.leak i{border-color:var(--vinho);color:var(--vinho)}
+.nd:hover i{transform:translateY(-2px)}
+.nd.past i{background:var(--musgo);border-color:var(--musgo);color:var(--perg)}
+.nd.past.leak i{background:var(--vinho);border-color:var(--vinho)}
+.nd.on{color:var(--txt);font-weight:600}
+.nd.on i{background:var(--floresta);border-color:var(--ouro);color:var(--perg);transform:scale(1.14);box-shadow:0 0 0 5px rgba(201,162,39,.25)}
+.jnav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:2px 0 10px}
+.jnav .cnt{font-size:13px;color:var(--suave);font-variant-numeric:tabular-nums}
+.jd{min-height:360px;margin-top:0;padding:24px}
+.jhead{display:flex;align-items:flex-end;gap:16px;margin-bottom:14px}
+.jnum{font-family:Fraunces,Georgia,serif;font-size:64px;line-height:.8;font-weight:300;color:var(--ouro)}
+.who{font-size:13px;color:var(--suave);margin:2px 0 0}
+.jbody{font-size:16px;max-width:640px;margin-bottom:16px}
+.leakflag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--vinho);background:var(--vinho-claro);padding:3px 10px;border-radius:999px;margin-left:8px;vertical-align:middle}
+
+/* ===== ritmo ===== */
+.rdg{display:flex;gap:8px;flex-wrap:wrap;align-items:center;min-height:32px;margin-bottom:10px}
+.rdg b{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:20px;margin-right:6px}
+.rtw{display:grid;gap:2px}
+.rrow{display:grid;grid-template-columns:168px minmax(0,1fr);gap:12px;align-items:center;width:100%;text-align:left;background:transparent;border:0;border-radius:10px;padding:6px 8px;transition:background .25s}
+.rrow:hover{background:rgba(16,36,28,.05)}
+.rrow.on{background:rgba(201,162,39,.14)}
+.rrow .rl{font-size:13px;line-height:1.2;color:var(--suave);transition:color .2s}
+.rrow.on .rl{color:var(--txt);font-weight:600}
+.tk{position:relative;height:28px;background-image:linear-gradient(90deg,var(--linha) 1px,transparent 1px);background-size:8.3333% 100%;border-right:1px solid var(--linha)}
+.tk .ln{position:absolute;top:50%;height:3px;margin-top:-1.5px;background:var(--linha2);border-radius:3px;transform-origin:left;animation:grow .9s .15s cubic-bezier(.3,0,.2,1) both}
+.rrow.on .tk .ln{background:var(--ouro)}
+.tk b{position:absolute;top:50%;width:12px;height:12px;margin:-6px 0 0 -6px;border-radius:50%;background:var(--pinho);animation:pop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d,0ms);transition:background .2s,box-shadow .2s}
+.rrow.on .tk b{background:var(--ouro);box-shadow:0 0 0 4px rgba(201,162,39,.28)}
+@keyframes pop{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes grow{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.axis .ax2{display:flex;justify-content:space-between;font-size:11px;color:var(--suave)}
+.axis{pointer-events:none;padding-top:0}
+@media(max-width:600px){.rrow{grid-template-columns:104px minmax(0,1fr);gap:8px}}
+
+/* ===== odontograma ===== */
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--suave);margin:4px 0 8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:4px;display:inline-block}
+.palette{display:flex;gap:8px;flex-wrap:wrap}
+.pal{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--linha2);background:var(--papel);padding:7px 12px;border-radius:10px;font-size:13px;font-weight:500;transition:all .2s}
+.pal:hover{border-color:var(--floresta)}
+.pal.on{background:var(--floresta);color:var(--perg);border-color:var(--floresta);box-shadow:0 6px 14px -8px rgba(16,36,28,.7)}
+.arch{display:flex;justify-content:safe center;gap:0;overflow-x:auto;padding:6px 0;scrollbar-width:none;-ms-overflow-style:none;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 20px,#000 calc(100% - 20px),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 20px,#000 calc(100% - 20px),transparent 100%)}
+.arch::-webkit-scrollbar{display:none}
+.half{display:flex;gap:3px;padding:0 8px}
+.half+.half{border-left:2px dashed var(--linha2)}
+.tooth{width:44px;flex:none;text-align:center;font-size:11px;color:var(--suave);font-variant-numeric:tabular-nums;padding:4px 0 2px;border-radius:10px;transition:background .2s}
+.tooth:hover{background:rgba(201,162,39,.14)}
+.tooth svg{display:block;width:38px;height:38px;margin:0 auto 2px;cursor:pointer;overflow:visible}
+.tooth svg polygon{fill:var(--papel);stroke:#9a916f;stroke-width:1.2;stroke-linejoin:round;transition:fill .15s}
+.tooth svg [data-f]:hover{fill:var(--ouro-claro)}
+.tooth svg .fc{fill:var(--verm)}.tooth svg .fr{fill:var(--azul)}
+.sep{height:2px;background:linear-gradient(90deg,transparent,var(--linha2),transparent);margin:6px 0 8px}
+.jawlab{text-align:center;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--suave);margin:2px 0}
+.pl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px;overflow:hidden;border:1px solid var(--linha);border-radius:12px;background:var(--papel)}
+.pl th{background:rgba(201,162,39,.14);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--vinho);text-align:left;padding:8px 14px}
+.pl td{padding:9px 14px;border-top:1px solid var(--linha);vertical-align:middle}
+.pl td.v{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.st{border:1px solid var(--linha2);background:var(--perg);padding:4px 12px;border-radius:999px;font-size:12px;font-weight:500;transition:all .2s;white-space:nowrap}
+.st:hover{border-color:var(--floresta)}
+.st.a{background:#ede0aa;border-color:var(--ouro)}
+.st.b{background:#cfe0d6;border-color:var(--musgo)}
+.st.c{background:var(--pinho);color:var(--perg);border-color:var(--pinho)}
+.emp{padding:26px;text-align:center;color:var(--suave);border:1px dashed var(--linha2);border-radius:12px}
+
+/* ===== face ===== */
+.face{background:radial-gradient(300px 260px at 50% 40%,#fbf6ea,var(--perg2))}
+.face svg{width:100%;max-width:340px;display:block;margin:0 auto;overflow:visible}
+.pt{cursor:pointer}
+.pt .ring{fill:none;stroke:var(--ouro);stroke-width:2;transform-box:fill-box;transform-origin:center;animation:ping 2.6s infinite;opacity:.9}
+.pt .core{fill:rgba(201,162,39,.35);stroke:var(--ouro);stroke-width:2;transition:all .25s;transform-box:fill-box;transform-origin:center}
+.pt:hover .core{fill:rgba(201,162,39,.8);transform:scale(1.2)}
+.pt.on .core{fill:var(--floresta);stroke:var(--floresta);transform:scale(1.25)}
+.pt.done .core{fill:var(--musgo);stroke:var(--musgo)}
+.pt.done .ring,.pt.on .ring{animation:none;opacity:0}
+.pt text{font-size:11px;font-weight:600;fill:var(--floresta);opacity:0;transition:opacity .2s;pointer-events:none;paint-order:stroke;stroke:#fbf6ea;stroke-width:4px}
+.pt:hover text,.pt.on text{opacity:1}
+@keyframes ping{0%{transform:scale(.8);opacity:.9}80%,100%{transform:scale(1.9);opacity:0}}
+
+/* ===== pasta ===== */
+.folder{display:flex;gap:4px;flex-wrap:wrap}
+.folder button{padding:8px 14px;border:1px solid var(--linha);border-bottom:0;background:rgba(16,36,28,.05);border-radius:12px 12px 0 0;font-size:13px;font-weight:500;color:var(--suave);transition:all .25s}
+.folder button:hover{background:rgba(16,36,28,.1)}
+.folder button.on{background:var(--papel);color:var(--txt);box-shadow:0 -3px 0 var(--ouro) inset}
+.paper{background:var(--papel);border:1px solid var(--linha);padding:20px;border-radius:0 14px 14px 14px;min-height:130px}
+.alertred{background:var(--verm);color:#fff;border-radius:12px;padding:12px 14px;font-size:14px;margin:6px 0;animation:swap .35s both}
+.alertgold{background:#f6ead0;border:1px solid var(--ouro);border-radius:12px;padding:12px 14px;font-size:14px;margin:6px 0;animation:swap .35s both}
+.alertred b,.alertgold b{display:block;margin-bottom:2px}
+
+/* ===== tabela ===== */
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--linha);vertical-align:top;overflow-wrap:anywhere}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--suave)}
+tbody tr{transition:background .2s}
+tbody tr:hover{background:rgba(201,162,39,.07)}
+.big2{font-size:24px;font-family:Fraunces,Georgia,serif;color:var(--ouro)}
+.flowc{margin:0;font-size:14px;transition:transform .4s,border-color .4s,box-shadow .4s}
+.flowc.hi{border-color:var(--ouro)!important;box-shadow:0 0 0 4px rgba(201,162,39,.25)!important;transform:translateY(-4px)}
+.flowc .n{font-family:Fraunces,Georgia,serif;font-size:30px;color:var(--ouro);line-height:1}
+#fpanel{min-height:330px}
+#fchk{min-height:200px}
+footer{padding:36px 20px 56px;text-align:center;color:var(--suave);font-size:13px}
+@media(max-width:600px){
+  .wrap{padding:0 16px}
+  .jnum{font-size:48px}
+  .jd{padding:18px}
+  input[type=number],input[type=text],input[type=search],select{font-size:16px}
+  .tab{padding:8px 12px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <span class="tag0">Estudo do Attlas</span>
+    <h1>Como a clínica funciona <em>por dentro</em></h1>
+    <p class="sub">Da pessoa que chega até a pessoa que volta e indica. Estética, odontologia e os bastidores. Mexa nas peças: é feita para entender fazendo.</p>
+    <div class="route" id="route"></div>
+    <div class="cap" id="cap"></div>
+  </div>
+</header>
+
+<nav class="tabs"><div class="in" id="tabs"></div></nav>
+
+<!-- 0 -->
+<section class="panel on" id="p-inicio"><div class="wrap">
+  <h2>Comece por aqui</h2>
+  <p class="lead">Uma clínica parece uma coisa só, mas faz seis negócios ao mesmo tempo. Por isso o software dela fica tão complexo.</p>
+  <div class="grid" id="seis"></div>
+
+  <div class="card">
+    <h3>A regra que explica quase tudo</h3>
+    <p>O tipo de clínica é definido pelo ritmo em que a pessoa volta. Quem volta todo mês vive de contrato. Quem volta de 3 em 3 meses vive de agenda de retorno. Quem faz um tratamento grande e some vive de orçamento. Quem atende por plano vive de tabela e de glosa.</p>
+    <p class="muted">Esse ritmo está desenhado, por tipo de clínica, na aba Tipos de clínica.</p>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h3>Como usar</h3>
+      <p>Cada aba tem peças para mexer: uma jornada que anda, um mapa de dentes onde você marca o que o dentista acharia, um rosto onde você registra uma aplicação, uma calculadora do dinheiro que a falta custa.</p>
+      <p>Comece pela <b>A jornada</b> e depois siga a ordem das abas.</p></div>
+    <div class="card"><h3>Os selos</h3>
+      <p><span class="s">📚</span> tem fonte (link na pasta da pesquisa)</p>
+      <p><span class="s">🟡</span> hipótese: senso comum do setor, sem fonte achada</p>
+      <p><span class="s">🔴</span> não achamos: tem que perguntar a uma clínica de verdade</p>
+      <p class="muted">Quando não há selo, é explicação de conceito.</p></div>
+    <div class="card"><h3>O que ainda não sabemos</h3>
+      <p>Não existe número bom, na internet, de falta, de ticket médio nem de quantos orçamentos viram tratamento. A aba <b>Glossário e lacunas</b> lista as perguntas para fazer a dona de uma clínica.</p></div>
+  </div>
+</div></section>
+
+<!-- 1 -->
+<section class="panel" id="p-jornada"><div class="wrap">
+  <h2>A jornada</h2>
+  <div class="bar">
+    <div class="seg" id="jseg"><button class="on" data-j="estetica">Clínica de estética</button><button data-j="odonto">Clínica odontológica</button></div>
+    <button class="btn alt" id="jplay">Ver a jornada passar</button>
+  </div>
+  <p class="muted">Clique em qualquer etapa. Os círculos com borda vinho são onde o dinheiro mais escapa. A pessoa se chama Alex.</p>
+  <div class="trkw" id="jtrk"></div>
+  <div class="jnav"><button class="btn alt" id="jprev">Anterior</button><span class="cnt" id="jcnt"></span><button class="btn" id="jnext">Próxima etapa</button></div>
+  <div class="jd card" id="jdet"></div>
+</div></section>
+
+<!-- 2 -->
+<section class="panel" id="p-prontuario"><div class="wrap">
+  <h2>Prontuário e anamnese</h2>
+  <p class="lead">Anamnese é a entrevista de saúde. Prontuário é a pasta oficial com tudo. A anamnese é uma folha dessa pasta.</p>
+
+  <div class="card"><h3>Abra a pasta de Alex</h3>
+    <div class="folder" id="fold"></div>
+    <div class="paper" id="paper"></div>
+  </div>
+
+  <div class="card"><h3>Simulador de anamnese</h3>
+    <p class="muted">Marque o que Alex responde. Veja o que muda na estética e na odontologia. Isso é o que o alerta vermelho no topo da ficha faz.</p>
+    <div class="two">
+      <div id="anam"></div>
+      <div><b>No topo da ficha de Alex</b><div id="anamout"></div></div>
+    </div>
+  </div>
+
+  <div class="card"><h3>Por que existe tanta tela de prontuário</h3>
+    <div class="grid" id="porque"></div>
+    <p style="margin-top:12px"><b>Guarda:</b> a lei de 2018 (13.787) fala em no mínimo 20 anos para o prontuário de saúde <span class="s">📚</span>. A resolução do CFO de 2009 fala em 10 anos para a odontologia <span class="s">📚</span>. Os conselhos aconselham guardar para sempre. <span class="s">🔴</span> Falta confirmar o prazo para biomédico, enfermeiro e prontuário eletrônico. <b>Regra segura para o Attlas: nunca apagar.</b></p>
+  </div>
+</div></section>
+
+<!-- 3 -->
+<section class="panel" id="p-odonto"><div class="wrap">
+  <h2>O odontograma</h2>
+  <p class="lead">É o mapa dos 32 dentes. O dentista fala dente e face (36 oclusal) e a auxiliar anota. Vermelho é o que falta fazer, azul é o que já foi feito <span class="s">📚</span>.</p>
+  <div class="card">
+    <div class="palette" id="otools"></div>
+    <div class="legend"><span><i class="sw" style="background:#B23A2B"></i>vermelho: a fazer</span><span><i class="sw" style="background:#2F6DB5"></i>azul: já feito</span></div>
+    <div class="row" style="margin:6px 0 10px"><button class="btn alt" id="oex">Carregar um caso de exemplo</button><button class="btn alt" id="oclr">Limpar</button></div>
+    <div class="jawlab">Em cima: arcada superior</div>
+    <div id="oarch"></div>
+    <div class="jawlab">Embaixo: arcada inferior</div>
+    <p class="muted" style="margin-top:8px">O número tem dois dígitos (sistema FDI). O primeiro é o quarto da boca: 1 e 2 em cima (direito e esquerdo do paciente), 4 e 3 embaixo. O segundo é a posição, de 1 (dente da frente) a 8 (siso). Dente 36 é o primeiro molar de baixo, lado esquerdo do paciente <span class="s">📚</span>.</p>
+  </div>
+  <div class="card"><h3>Do odontograma ao orçamento</h3>
+    <p class="muted">Plano é o que fazer e em que ordem. Orçamento é quanto custa. Os valores abaixo são inventados, só para ver a conta.</p>
+    <div id="otab"></div>
+    <div class="stats" id="ost" style="display:none"></div>
+    <p class="muted" id="onote" style="margin-top:10px"></p>
+  </div>
+</div></section>
+
+<!-- 4 -->
+<section class="panel" id="p-facial"><div class="wrap">
+  <h2>O mapa facial</h2>
+  <p class="lead">Na estética, o odontograma é um rosto. Marcam-se os pontos aplicados, o produto, a dose e o lote.</p>
+  <div class="two">
+    <div class="card face"><svg viewBox="0 0 300 360" id="fsvg"></svg><p class="muted" style="text-align:center">Clique num ponto. D e E são o lado direito e esquerdo de Alex.</p></div>
+    <div>
+      <div class="card" id="fpanel"><p class="muted">Escolha um ponto no rosto.</p></div>
+      <div class="card"><h3>Registro no prontuário</h3><div id="frec"><p class="muted">Nada registrado ainda.</p></div></div>
+      <div class="card"><h3>A checagem do dia da aplicação</h3><div id="fchk"></div></div>
+    </div>
+  </div>
+</div></section>
+
+<!-- 5 -->
+<section class="panel" id="p-tipos"><div class="wrap">
+  <h2>Tipos de clínica</h2>
+  <div class="bar"><div class="seg" id="gseg"><button class="on" data-g="estetica">Estética</button><button data-g="odonto">Odontologia</button></div></div>
+  <p class="muted">Cada linha é um tipo. Os pontos são as visitas ao longo de 12 meses. Clique em uma linha para abrir.</p>
+  <div class="card"><div class="rdg" id="rdg"></div><div class="rtw" id="rt"></div></div>
+  <div class="card" id="tdet"></div>
+  <div class="warn"><b>Quatro motores servem quase tudo na odontologia</b> <span class="s">🟡</span>: agenda de retorno por ciclo, contrato com parcelas, orçamento por fases com laboratório e exames, e faturamento de convênio com guia e glosa. O prontuário base é odontograma e anamnese, e cada especialidade soma um campo próprio.</div>
+</div></section>
+
+<!-- 6 -->
+<section class="panel" id="p-convenio"><div class="wrap">
+  <h2>Convênio odontológico</h2>
+  <p class="lead">A pessoa paga mensalidade a um plano, e o plano paga a clínica pelo tratamento. A clínica é credenciada, ou seja, tem contrato com ele.</p>
+  <div class="row"><button class="btn" id="cplay">Ver o caminho de uma guia</button><button class="btn alt" id="cglosa">E se der errado?</button></div>
+  <div class="grid" id="cflow" style="margin-top:14px"></div>
+  <div class="card" id="cgl" style="display:none"><h3>Glosa: o plano se recusa a pagar um item</h3>
+    <p>Causas comuns <span class="s">📚</span>: código do procedimento errado, falta de autorização prévia, prazo de envio perdido, paciente diferente do cadastro. A clínica pode recorrer. O dinheiro já foi trabalhado e não entrou.</p>
+    <p><b>Quando a clínica usa cada modelo</b> <span class="s">🟡</span>: só particular (ticket maior, menos pacientes), só convênio (volume alto, preço baixo, muita burocracia), ou misto, que é o mais comum. O risco do misto é a recepção confundir as regras.</p></div>
+</div></section>
+
+<!-- 7 -->
+<section class="panel" id="p-dia"><div class="wrap">
+  <h2>O dia de cada papel</h2>
+  <div class="row" id="prole" style="margin:10px 0"></div>
+  <div id="pdia"></div>
+</div></section>
+
+<!-- 8 -->
+<section class="panel" id="p-dinheiro"><div class="wrap">
+  <h2>Dinheiro e bastidores</h2>
+  <div class="card"><h3>Quanto a falta custa</h3>
+    <p class="muted">Falta é quando a pessoa marca e não aparece. Não achamos número confiável para clínica brasileira; a faixa de trabalho é 15% a 25% sem rotina de confirmação, e 8% a 12% com lembrete por WhatsApp <span class="s">🟡</span> (números de blog de fornecedor).</p>
+    <div class="grid">
+      <label>Marcados por dia<br><input type="number" id="f1" value="14" min="1"></label>
+      <label>Valor de cada hora (R$)<br><input type="number" id="f2" value="300" min="0"></label>
+      <label>Faltas sem lembrete (%)<br><input type="number" id="f3" value="20" min="0" max="100"></label>
+      <label>Faltas com lembrete (%)<br><input type="number" id="f4" value="10" min="0" max="100"></label>
+      <label>Dias de atendimento por mês<br><input type="number" id="f5" value="22" min="1"></label>
+    </div>
+    <div class="stats" id="fout"></div>
+  </div>
+
+  <div class="card"><h3>O que sobra do cartão</h3>
+    <p class="muted">A clínica pensa que faturou R$ 10 mil e a conta recebe menos, espalhado em parcelas. Taxas de exemplo: crédito parcelado a partir de cerca de 5,4%, antecipação de 1,49% a 3,5% ao mês <span class="s">📚</span>.</p>
+    <div class="grid">
+      <label>Valor da venda (R$)<br><input type="number" id="c1" value="10000"></label>
+      <label>Taxa da maquininha (%)<br><input type="number" id="c2" value="5.4" step="0.1"></label>
+      <label>Parcelas<br><input type="number" id="c3" value="6" min="1" max="18"></label>
+      <label>Antecipação ao mês (%)<br><input type="number" id="c4" value="2.5" step="0.1"></label>
+    </div>
+    <div class="stats" id="cout"></div>
+  </div>
+
+  <div class="card"><h3>O caminho de um frasco de toxina</h3>
+    <p class="muted">Lote e validade são o que deixa a clínica reagir quando a Anvisa avisa de um lote falso. Em julho de 2025 a Anvisa mandou apreender um lote falsificado de Botox <span class="s">📚</span>.</p>
+    <div class="row" id="est"></div>
+  </div>
+
+  <div class="card"><h3>Os 10 erros que fazem a clínica perder dinheiro</h3><ol id="erros" style="margin:0;padding-left:20px"></ol></div>
+</div></section>
+
+<!-- 9 -->
+<section class="panel" id="p-quem"><div class="wrap">
+  <h2>Quem pode fazer o quê (estética)</h2>
+  <div class="warn"><b>Em disputa na Justiça em 2026.</b> Não trate nada daqui como definitivo. O sistema deve registrar quem fez e com qual registro no conselho (CRM, CRO, CRBM, COREN), sem travar por profissão.</div>
+  <div class="grid" id="qgrid" style="margin-top:14px"></div>
+</div></section>
+
+<!-- 10 -->
+<section class="panel" id="p-attlas"><div class="wrap">
+  <h2>O Attlas cobre isso?</h2>
+  <div class="warn"><b>Primeira leitura, não o cruzamento final.</b> Foi feita só com o mapa do sistema (MAPA-DO-SISTEMA.md, de 2026-10-07, com o que ele registra até a 0030). Não consultei a Central. Cada linha precisa ser conferida lá <span class="s">🟡</span>.</div>
+  <div class="row" id="afil" style="margin:12px 0"></div>
+  <div class="card"><table><thead><tr><th>Necessidade da clínica</th><th>Situação</th><th>Onde / observação</th></tr></thead><tbody id="atb"></tbody></table></div>
+</div></section>
+
+<!-- 11 -->
+<section class="panel" id="p-glossario"><div class="wrap">
+  <h2>Glossário e lacunas</h2>
+  <input type="search" id="gq" placeholder="Buscar um termo" style="width:100%;max-width:420px;margin:10px 0">
+  <div class="grid" id="gl"></div>
+  <div class="card" style="margin-top:20px"><h3>O que ficou sem resposta <span class="s">🔴</span></h3>
+    <p class="muted">São as perguntas para levar a quem dirige uma clínica e a dentistas de verdade.</p>
+    <ol id="lac" style="margin:0;padding-left:20px"></ol></div>
+</div></section>
+
+<footer>Pesquisa de 2026-10-13. Fontes e detalhes: pasta <b>pesquisa</b> ao lado deste arquivo.</footer>
+
+<script>
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const R$=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
+const set=(el,h)=>{el.innerHTML=h};
+
+/* ===== topo animado ===== */
+const STN=[['Contato','Alex vê um post e chama no WhatsApp.'],['Agenda','Marca o horário e recebe a confirmação.'],['Recepção','Chega, cadastra e assina os termos.'],['Consulta','Anamnese, exame e plano.'],['Orçamento','Ouve o preço e decide.'],['Procedimento','Tratamento feito, lote e dose registrados.'],['Pagamento','Pix, cartão ou parcelas.'],['Volta','Retorno marcado e indicação.']];
+(function(){
+  const r=$('#route'); let i=0;
+  set(r,'<div class="rfill" id="rfill"></div>'+STN.map((s,k)=>`<div class="stn"><i>${k+1}</i><span>${s[0]}</span></div>`).join(''));
+  const st=$$('.stn',r);
+  function go(){
+    st.forEach((e,k)=>{e.classList.toggle('on',k===i);e.classList.toggle('done',k<i)});
+    const a=st[0].offsetLeft+st[0].offsetWidth/2, b=st[st.length-1].offsetLeft+st[st.length-1].offsetWidth/2, x=st[i].offsetLeft+st[i].offsetWidth/2;
+    const f=$('#rfill'); f.style.left=a+'px'; f.style.width=(x-a)+'px';
+    $('#cap').innerHTML='<b>'+STN[i][0]+'</b> '+STN[i][1];
+    i=(i+1)%STN.length;
+  }
+  go();
+  if(!matchMedia('(prefers-reduced-motion:reduce)').matches) setInterval(go,2200);
+  addEventListener('resize',()=>{i=(i+STN.length-1)%STN.length;go()});
+})();
+
+/* ===== abas ===== */
+const TABS=[['inicio','Comece aqui'],['jornada','A jornada'],['prontuario','Prontuário e anamnese'],['odonto','Odontograma'],['facial','Mapa facial'],['tipos','Tipos de clínica'],['convenio','Convênio'],['dia','O dia de cada papel'],['dinheiro','Dinheiro e bastidores'],['quem','Quem pode o quê'],['attlas','O Attlas cobre?'],['glossario','Glossário e lacunas']];
+const INIT={}, DONE={};
+set($('#tabs'),'<span id="ind"></span>'+TABS.map(t=>`<button class="tab" data-t="${t[0]}">${t[1]}</button>`).join(''));
+TABS.forEach((t,i)=>{const h=$('#p-'+t[0]+' h2'); if(h) h.insertAdjacentHTML('beforebegin',`<div class="eyebrow"><i>${String(i).padStart(2,'0')}</i>${i?'Parte '+i+' de '+(TABS.length-1):'Introdução'}</div>`)});
+const io='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.05}):null;
+function reveal(id){ $$('#p-'+id+' > .wrap > *').forEach(el=>{ if(el.classList.contains('rv'))return; el.classList.add('rv'); if(io) io.observe(el); else el.classList.add('in') }) }
+function stagger(sel){ $$(sel).forEach((el,i)=>{el.style.setProperty('--i',i);el.classList.add('up')}) }
+function ind(){ const b=$('.tab.on'), i=$('#ind'); if(!b||!i) return; i.style.width=b.offsetWidth+'px'; i.style.transform='translateX('+b.offsetLeft+'px)';
+  const t=$('#tabs'); t.scrollTo({left:b.offsetLeft-(t.clientWidth-b.offsetWidth)/2,behavior:'smooth'}) }
+const REDUZ=matchMedia('(prefers-reduced-motion:reduce)').matches;
+function tween(el,to,fmt){ const from=el._v||0; el._v=to; cancelAnimationFrame(el._r);
+  if(REDUZ||from===to){el.textContent=fmt(to);return}
+  const t0=performance.now(); const st=now=>{const k=Math.min(1,(now-t0)/520),e=1-Math.pow(1-k,3); el.textContent=fmt(from+(to-from)*e); if(k<1) el._r=requestAnimationFrame(st)}; el._r=requestAnimationFrame(st) }
+function stats(box,items,fmt=R$){
+  if(box.children.length!==items.length) set(box,items.map(i=>`<div class="stat"><div class="sl"></div><div class="sv">0</div></div>`).join(''));
+  [...box.children].forEach((c,k)=>{c.className='stat '+(items[k].c||'');c.firstChild.textContent=items[k].l;tween(c.lastChild,items[k].v,fmt)}) }
+function show(id,user){
+  if(!TABS.some(t=>t[0]===id)) id='inicio';
+  $$('.panel').forEach(p=>p.classList.toggle('on',p.id==='p-'+id));
+  $$('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===id));
+  ind();
+  if(INIT[id]&&!DONE[id]){DONE[id]=1;INIT[id]()}
+  reveal(id);
+  try{localStorage.setItem('clinica-aba',id)}catch(e){}
+  history.replaceState(null,'','#'+id);
+  // só volta ao topo do conteúdo se a pessoa já tinha passado do topo; nunca rola para baixo
+  const topo=$('.hero').offsetHeight;
+  if(user && scrollY>topo) scrollTo({top:topo,behavior:'instant'});
+}
+$('#tabs').addEventListener('click',e=>{const b=e.target.closest('.tab'); if(b) show(b.dataset.t,true)});
+addEventListener('resize',ind);
+
+/* ===== comece aqui ===== */
+const SEIS=[['Uma agenda','Tempo. Quem atende quem, quando e em qual sala.'],['Um hospital pequeno','Prontuário. Anamnese, evolução, fotos, termos.'],['Uma loja','Venda e estoque. Orçamento, produto, lote e validade.'],['Um banco','Parcelas, cartão, carnê e cobrança.'],['Uma empresa','Equipe, comissão, nota fiscal e imposto.'],['Uma agência','Marketing e WhatsApp, o dia inteiro.']];
+set($('#seis'),SEIS.map((s,k)=>`<div class="card"><div class="big2">${k+1}</div><h3>${s[0]}</h3><p class="muted" style="margin:0">${s[1]}</p></div>`).join(''));
+INIT.inicio=()=>stagger('#seis > .card');
+
+/* ===== jornada ===== */
+const J={
+estetica:[
+{t:'Primeiro contato',q:'Recepção ou dona',o:'Alex vê um antes e depois no Instagram, ouve de uma amiga ou acha a clínica no Google, e chama no WhatsApp ou no direct. Instagram e indicação são as duas portas mais comuns.',d:'Mensagem que fica horas sem resposta. Quem pergunta preço compra de quem responde primeiro.',s:'Uma caixa única de conversas, que mostra de onde a pessoa veio. A IA faz a primeira resposta e uma pessoa revisa.',x:'🟡',l:1},
+{t:'Conversa inicial',q:'Recepção ou dona',o:'Alex pergunta: quanto custa o botox? Se a clínica só passa preço, a pessoa compara e some. Se explica que antes precisa de uma avaliação, ela agenda.',d:'Responder só o preço.',s:'Roteiro de resposta que leva para a avaliação, com respostas prontas.',x:'🟡',l:1},
+{t:'Agendamento',q:'Recepção',o:'Marca-se uma consulta de avaliação, às vezes cobrada, às vezes grátis, conforme a clínica.',d:'Agenda em caderno ou no WhatsApp, horários que batem.',s:'Agenda por profissional e sala, com o tempo certo para cada tipo de consulta.',x:'🟡'},
+{t:'Confirmação',q:'Recepção ou o sistema',o:'Um ou dois dias antes vai uma mensagem pedindo para confirmar. Se Alex não responde, a recepção liga.',d:'A falta (no-show): a hora do profissional fica vazia. Lembrete por WhatsApp é a principal arma.',s:'Lembrete automático com botão de confirmar ou remarcar e aviso de quem não respondeu.',x:'📚',l:1},
+{t:'Chegada',q:'Recepção',o:'Alex chega, passa pela recepção, cria o cadastro, preenche a ficha e assina os termos. Muita clínica ainda usa papel ou tablet.',d:'Termo em papel some e é difícil de achar numa auditoria.',s:'Cadastro e termo por link antes da chegada; check-in que avisa o profissional.',x:'🟡'},
+{t:'Consulta de avaliação',q:'Profissional',o:'Ouve a queixa, faz a anamnese, examina o rosto, fotografa de frente e de perfil com a mesma luz, explica o que indica e o que não indica, os riscos e o que esperar, e monta o plano: o que agora, o que depois, em que ordem.',d:'Foto esquecida, anamnese solta, expectativa mal alinhada.',s:'Anamnese digital, fotos padronizadas na ficha, mapa facial e plano por etapas.',x:'🟡'},
+{t:'Proposta e orçamento',q:'Profissional e recepção ou dona',o:'O profissional diz o que quer fazer, quem cuida do valor fala o preço. Pode ser um procedimento só ou um plano (toxina hoje, bioestimulador daqui a 30 dias).',d:'Aqui o orçamento esfria: Alex diz vou pensar e some, e ninguém volta a procurar.',s:'Orçamento com validade e lembrete automático de acompanhar.',x:'🟡',l:1},
+{t:'Pagamento',q:'Recepção',o:'Pix à vista (muitas vezes com desconto), cartão parcelado ou pacote pago adiantado, como 4 sessões de laser.',d:'Cartão em muitas parcelas: a clínica recebe depois e com taxa. Sessões do pacote usadas sem controle e desconto combinado de boca.',s:'Pacote com saldo de sessões e valor líquido do cartão.',x:'🟡',l:1},
+{t:'O procedimento',q:'Profissional',o:'Pode ser no mesmo dia da avaliação (comum na toxina) ou em outro. Antes: limpeza da pele, anestésico tópico se preciso, marcação do rosto com lápis, conferência do produto (lote e validade) e termo assinado. Depois: orientações.',d:'Lote anotado à mão, ou nem anotado.',s:'Mapa facial que já baixa o frasco do estoque e grava lote, validade e dose no prontuário.',x:'🟡'},
+{t:'Pós-procedimento',q:'Profissional e recepção',o:'Orientações: não deitar por algumas horas, sem exercício, gelo, sinais de alerta. Muitas clínicas mandam mensagem no dia seguinte perguntando como Alex está.',d:'Susto sem resposta, no WhatsApp pessoal de alguém.',s:'Mensagem automática de pós e um canal para intercorrência.',x:'🟡'},
+{t:'Retorno ou revisão',q:'Profissional',o:'Alguns procedimentos pedem uma volta curta, de 10 a 15 dias, para avaliar o resultado e retocar se precisar.',d:'Retorno que ninguém marca.',s:'Retorno programado a partir do procedimento.',x:'📚'},
+{t:'Recorrência',q:'Recepção e sistema',o:'A estética vive de repetição porque o efeito passa. Toxina dura 3 a 6 meses, bioestimulador cerca de 1 ano e meio, fios de PDO cerca de 6 meses, depilação a laser pede 6 a 8 sessões.',d:'Esquecer de chamar quando vence. A agenda esvazia e ninguém vê alarme.',s:'Régua de retorno por procedimento: o sistema sabe quando vence e chama.',x:'📚',l:1},
+{t:'Indicação',q:'Todo mundo',o:'Quem gostou traz amiga, marca a clínica no Instagram ou indica no WhatsApp. É a fonte de paciente mais barata.',d:'Poucas clínicas medem e quase nenhuma agradece.',s:'Programa de indicação simples ligado à ficha.',x:'🟡'}
+],
+odonto:[
+{t:'Contato',q:'Recepção',o:'Alex manda mensagem, liga ou aparece na porta. A recepção anota nome, telefone e o motivo.',d:'Telefone e WhatsApp ao mesmo tempo, e quem fica sem resposta some.',s:'Caixa única de conversas; o contato já vira lead.',x:'📚',l:1},
+{t:'Agendamento',q:'Recepção',o:'Duas portas. Urgência: dor, dente quebrado, entra no mesmo dia (encaixe). Avaliação: marca com calma. A recepção pergunta se é particular ou convênio, e o motivo define o tempo reservado.',d:'O encaixe quebra a agenda; tempo errado atrasa o dia todo. Mas a urgência é o que mais traz paciente novo.',s:'Agenda por profissional e cadeira, tempo por tipo de consulta, encaixe com fila de espera.',x:'🟡'},
+{t:'Confirmação',q:'Recepção ou o sistema',o:'Um ou dois dias antes: Confirmando sua consulta amanhã às 14h. Sistemas fazem isso sozinhos por WhatsApp e SMS.',d:'Falta: cadeira parada com dentista pago. Em serviço público a falta chegou a cerca de 24%.',s:'Lembrete com botão de confirmar ou remarcar.',x:'📚',l:1},
+{t:'Chegada',q:'Recepção',o:'Registra que chegou. Na primeira vez faz o cadastro (CPF, contato, quem indicou) e confere documento e carteirinha do convênio.',d:'Cadastro em papel, carteirinha esquecida, dentista sem aviso.',s:'Check-in de um toque que avisa o profissional.',x:'📚'},
+{t:'Triagem e anamnese',q:'Auxiliar (ASB) ou dentista',o:'Perguntas de saúde: alergia, diabetes, pressão, anticoagulante, gestação, remédios. A pessoa assina.',d:'Ficha de papel desatualizada. Quem tinha pressão normal há dois anos pode ter hoje.',s:'Anamnese digital, alerta vermelho no topo da ficha e pergunta de atualização a cada retorno.',x:'📚'},
+{t:'Exame clínico',q:'Dentista e auxiliar',o:'O dentista olha dente por dente com espelho e sonda e vai falando em voz alta (24 oclusal, cárie). A auxiliar anota no odontograma.',d:'Digitar duas vezes: falar, anotar no papel, passar para o sistema. O que exige digitação dupla morre.',s:'Odontograma que se toca, direto na cadeira.',x:'🟡',l:1},
+{t:'Exames de imagem',q:'Dentista ou centro de radiologia',o:'Periapical: um ou dois dentes com a raiz. Interproximal: cáries entre dentes. Panorâmica: a boca toda. Tomografia: 3D, para implante e siso, quase sempre feita fora, com laudo.',d:'Imagem perdida em CD, e-mail ou celular.',s:'Imagens anexadas ao dente e ao paciente.',x:'🟡'},
+{t:'Diagnóstico',q:'Dentista',o:'Junta o que viu na boca, nos exames e na conversa: 4 cáries, 1 canal, precisa de limpeza.',d:'Diagnóstico que não vira registro claro nem plano.',s:'Diagnóstico por dente que já gera os itens do plano.',x:'🟡'},
+{t:'Plano e orçamento',q:'Dentista',o:'Plano é o que fazer e em que ordem (clínico). Orçamento é quanto custa e como pagar (financeiro). Vem em fases: urgência, restaurar, repor e embelezar.',d:'Plano na cabeça do dentista e orçamento em outro papel.',s:'Cada item do plano vira linha do orçamento, com status: não aprovado, aprovado, em andamento, concluído.',x:'🟡'},
+{t:'Apresentação e aprovação',q:'Dentista, coordenação de tratamento ou recepção',o:'A pergunta de sempre: dá quanto? Dá para parcelar? A pessoa aprova tudo, uma parte, ou leva para pensar.',d:'Aqui some muito dinheiro: aprovou e nunca marcou, ou levou para pensar e ninguém ligou. Muito dentista foge de falar de dinheiro.',s:'Orçamento com opções, link para decidir em casa e lista de orçamentos parados para ligar.',x:'🟡',l:1},
+{t:'Pagamento',q:'Recepção',o:'Particular: à vista ou parcelado, muitas vezes com entrada. Convênio: o plano paga o que cobre. Pode ser cartão, carnê da clínica ou financiamento de terceiros.',d:'Taxa do cartão que come a margem, carnê que atrasa, desconto de boca.',s:'Parcelas por forma de pagamento, valor líquido e régua de cobrança.',x:'📚',l:1},
+{t:'Sessões de tratamento',q:'Dentista e auxiliar',o:'Raramente acaba numa consulta. Canal em 2 a 3 sessões, prótese em 3 a 4, restaurações divididas por lado da boca. Cada sessão precisa ser marcada.',d:'Tratamento abandonado no meio: a pessoa some depois da entrada.',s:'Próxima sessão marcada antes de sair; alerta de tratamento parado.',x:'🟡',l:1},
+{t:'Evolução',q:'Dentista',o:'Em cada consulta registra data, dente, procedimento, material, anestésico e intercorrência, e assina.',d:'Evolução incompleta desprotege em processo.',s:'Evolução rápida, assinatura digital e rastro de quem registrou e quando.',x:'🟡'},
+{t:'Alta',q:'Dentista',o:'Terminado o plano, dá a alta e orienta a manutenção.',d:'Sem alta registrada, a pessoa não sabe que precisa voltar.',s:'A alta já programa a revisão.',x:'🟡'},
+{t:'Retorno de 6 meses',q:'Recepção e sistema',o:'Limpeza (profilaxia) e revisão a cada 6 meses, às vezes 3 para gengiva doente. Mantém a pessoa na clínica para sempre.',d:'Nenhuma recepção lembra de mil pacientes à mão. Quem fez limpeza há 8 meses só volta com dor, e tratamento mais caro.',s:'Lista de quem está na hora de voltar, com mensagem automática.',x:'🟡',l:1},
+{t:'Indicação',q:'Todo mundo',o:'Quem ficou satisfeito indica familiar e amigo. Na odontologia é o canal mais barato e mais forte.',d:'Ninguém mede nem agradece.',s:'Programa de indicação ligado à ficha.',x:'🟡'}
+]};
+INIT.jornada=()=>{
+  let cur='estetica', i=0, timer=null;
+  const trk=$('#jtrk'), det=$('#jdet');
+  function build(){
+    set(trk,`<div class="trk"><div class="pg" id="pg"></div>${J[cur].map((s,k)=>`<button class="nd ${s.l?'leak':''}" data-k="${k}"><i>${k+1}</i>${s.t}</button>`).join('')}</div>`);
+    sel(0,true);
+  }
+  function sel(k,first){
+    i=k; const s=J[cur][k], N=J[cur].length;
+    const nd=$$('.nd',trk); nd.forEach((n,j)=>{n.classList.toggle('on',j===k);n.classList.toggle('past',j<k)});
+    const n=nd[k], a=nd[0].offsetLeft+nd[0].offsetWidth/2, pg=$('#pg');
+    pg.style.left=a+'px'; pg.style.width=(n.offsetLeft+n.offsetWidth/2-a)+'px';
+    trk.scrollTo({left:n.offsetLeft-trk.clientWidth/2+n.offsetWidth/2,behavior:first?'auto':'smooth'});
+    $('#jprev').disabled=k===0; $('#jnext').disabled=k===N-1; $('#jcnt').textContent=(k+1)+' de '+N;
+    set(det,`<div class="swap"><div class="jhead"><div class="jnum">${k+1}</div><div><h3 style="margin:0">${s.t} <span class="s">${s.x}</span>${s.l?'<span class="leakflag">dinheiro escapa aqui</span>':''}</h3><p class="who">Quem faz: ${s.q}</p></div></div>
+      <p class="jbody">${s.o}</p>
+      <div class="two"><div class="pain"><b>Onde dói</b>${s.d}</div><div class="sys"><b>O que um sistema faz</b>${s.s}</div></div></div>`);
+  }
+  trk.addEventListener('click',e=>{const b=e.target.closest('.nd'); if(b){stop();sel(+b.dataset.k)}});
+  $('#jprev').onclick=()=>{stop();if(i>0)sel(i-1)};
+  $('#jnext').onclick=()=>{stop();if(i<J[cur].length-1)sel(i+1)};
+  $$('#jseg button').forEach(b=>b.onclick=()=>{cur=b.dataset.j;$$('#jseg button').forEach(x=>x.classList.toggle('on',x===b));stop();build()});
+  function stop(){clearInterval(timer);timer=null;$('#jplay').textContent='Ver a jornada passar'}
+  $('#jplay').onclick=()=>{ if(timer){stop();return}
+    $('#jplay').textContent='Parar'; sel(0);
+    timer=setInterval(()=>{ if(i+1>=J[cur].length){stop();return} sel(i+1)},3600)};
+  build();
+};
+
+/* ===== prontuário ===== */
+const PASTA=[
+['Cadastro','Nome, contato, CPF, quem indicou, responsável (no caso de criança) e convênio. Na estética e na odontologia, é a primeira folha.'],
+['Anamnese','A entrevista de saúde: alergias, remédios, doenças, gestação, procedimentos anteriores. Tem que ser atualizada, não só preenchida uma vez.'],
+['Odontograma ou mapa facial','O desenho do que há em cada dente ou em cada ponto do rosto. É onde o profissional fala dente e face, ou ponto e dose.'],
+['Evolução','Um registro por visita: data, o que foi feito, material ou produto, reação. É o diário da pessoa dentro da clínica, e vem assinado.'],
+['Exames e fotos','Radiografias, tomografia e laudos na odontologia; fotos de antes e depois, de frente e de perfil, na estética.'],
+['Termos','Consentimento do procedimento e, separado, autorização de uso de imagem se a clínica quiser postar a foto. Foto de rosto ligada ao atendimento é dado de saúde, e a LGPD pede um termo próprio para o uso em marketing 📚.'],
+['Produto, lote e dose','Marca, lote, validade e quantidade aplicada. Se um lote der problema, é por aqui que se acha quem recebeu.'],
+['Orçamento e plano','O que se combinou fazer e quanto custa. Cada item tem status, para saber o que foi aprovado e o que está parado.'],
+['Receita e atestado','O que o profissional prescreveu e o atestado de comparecimento ou repouso. No digital sai pronto, com os dados já preenchidos.']
+];
+const PORQUE=[['Obrigação','A Anvisa exige prontuário (físico ou eletrônico, assinado) em serviço de estética, e inspeciona 📚. É a única parte do sistema que a lei obriga.'],['Segurança','Se Alex tem alergia a um anestésico, isso tem de estar escrito antes de a agulha entrar.'],['Defesa em processo','Quando alguém reclama de resultado ruim, o prontuário completo prova que o profissional agiu certo. É o motivo que mais convence dono de clínica 🟡.'],['Plano de tratamento','O profissional lê o que fez na última vez para decidir o que fazer agora. Sem registro, cada visita recomeça do zero.'],['A cola do sistema','Quanto mais histórico fica lá dentro, mais difícil trocar de sistema 🟡.']];
+const ANAM=[
+['alergia','Alergia a anestésico','Registrar antes de aplicar qualquer coisa; alergias comuns também incluem látex e ácido hialurônico.','Contraindicação absoluta ao anestésico local, e há alergia a bissulfito de sódio, que vem em alguns tubetes 📚.',2],
+['gestante','Gestante ou amamentando','A maioria dos injetáveis é evitada.','Cuidado especial com anestésicos, exames e remédios; há um melhor período para tratar.',2],
+['anticoag','Toma anticoagulante','Aumenta o roxo na aplicação.','Pode sangrar demais numa extração: o dentista avisa o médico antes.',2],
+['diabetes','Diabetes','Doenças como diabetes pedem atenção no histórico.','Queda do açúcar é a emergência mais comum no consultório 📚; cicatriza pior e infecta mais fácil 🟡.',1],
+['pressao','Pressão alta ou coração','Entra no histórico de saúde.','Doença do coração pede cuidado com o anestésico 📚; pressão muito alta pode adiar o procedimento 🟡.',1],
+['herpes','Herpes recorrente','Pode reativar após o procedimento; entra na anamnese.','Pergunta de rotina; boca é onde mais aparece.',1],
+['queloide','Cicatriz que engrossa (queloide)','Atenção em qualquer procedimento que deixe marca.','Atenção em cirurgias e extrações.',1],
+['fuma','Fuma','Hábito registrado na anamnese.','Cicatriza pior; importante em implantes 🟡.',1]
+];
+INIT.prontuario=()=>{
+  set($('#fold'),PASTA.map((p,k)=>`<button data-k="${k}">${p[0]}</button>`).join(''));
+  const ps=(k)=>{ $$('#fold button').forEach((b,j)=>b.classList.toggle('on',j===k)); set($('#paper'),`<h3 style="font-size:20px">${PASTA[k][0]}</h3><p>${PASTA[k][1]}</p>`)};
+  $('#fold').onclick=e=>{const b=e.target.closest('button'); if(b) ps(+b.dataset.k)}; ps(0);
+  set($('#anam'),ANAM.map(a=>`<label class="chk"><input type="checkbox" data-a="${a[0]}"> ${a[1]}</label>`).join(''));
+  const out=()=>{
+    const on=ANAM.filter(a=>$(`[data-a="${a[0]}"]`).checked);
+    set($('#anamout'),on.length?on.map(a=>`<div class="${a[4]===2?'alertred':'alertgold'}"><b>${a[1]}</b><br>Estética: ${a[2]}<br>Odontologia: ${a[3]}</div>`).join(''):'<p class="muted">Sem alerta. Marque ao lado.</p>');
+  };
+  $('#anam').onchange=out; out();
+  set($('#porque'),PORQUE.map(p=>`<div class="card"><h3 style="font-size:19px">${p[0]}</h3><p style="margin:0">${p[1]}</p></div>`).join(''));
+  stagger('#porque > .card');
+};
+
+/* ===== odontograma ===== */
+const UP=[18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28], LO=[48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38];
+const FAC={V:'vestibular',L:'lingual ou palatina',O:'oclusal',M:'mesial',D:'distal'};
+const TOOLS=[['carie','Cárie (a restaurar)','f','#B23A2B'],['rest','Restauração feita','f','#2F6DB5'],['canal','Canal (a fazer)','w','#7A3325'],['coroa','Coroa (a fazer)','w','#C9A227'],['ausente','Dente ausente','w','#777'],['extrair','Extração (a fazer)','w','#B23A2B'],['borracha','Borracha','x','#bbb']];
+INIT.odonto=()=>{
+  const T={}, SM={}; let tool='carie';
+  const NEXT=['não aprovado','aprovado','em andamento','concluído'], CL=['','a','b','c'];
+  const mesialRight=n=>{const q=Math.floor(n/10);return q===1||q===4};
+  function tooth(n){
+    const d=T[n]||{f:{},w:null}; const mr=mesialRight(n);
+    const faces={V:'4,4 40,4 30,14 14,14',L:'14,30 30,30 40,40 4,40',O:'14,14 30,14 30,30 14,30',
+      [mr?'D':'M']:'4,4 14,14 14,30 4,40',[mr?'M':'D']:'40,4 30,14 30,30 40,40'};
+    let o='';
+    Object.entries(faces).forEach(([f,p])=>{o+=`<polygon data-f="${f}" points="${p}" class="${d.f[f]==='carie'?'fc':d.f[f]==='rest'?'fr':''}"/>`});
+    const w=d.w;
+    if(w==='ausente') o+='<path d="M6 6L38 38M38 6L6 38" stroke="#777" stroke-width="3" opacity=".85" stroke-linecap="round"/>';
+    if(w==='extrair') o+='<path d="M6 6L38 38M38 6L6 38" stroke="#B23A2B" stroke-width="3" stroke-linecap="round"/>';
+    if(w==='canal') o+='<path d="M22 22V46" stroke="#7A3325" stroke-width="4" stroke-linecap="round"/>';
+    if(w==='coroa') o+='<circle cx="22" cy="22" r="20" fill="none" stroke="#C9A227" stroke-width="3"/>';
+    return `<div class="tooth" data-n="${n}"><svg viewBox="0 0 44 44">${o}</svg>${n}</div>`;
+  }
+  const half=a=>`<div class="half">${a.map(tooth).join('')}</div>`;
+  const arch=a=>`<div class="arch">${half(a.slice(0,8))}${half(a.slice(8))}</div>`;
+  set($('#oarch'),arch(UP)+'<div class="sep"></div>'+arch(LO));
+  set($('#otools'),TOOLS.map(t=>`<button class="pal ${t[0]===tool?'on':''}" data-t="${t[0]}"><i class="sw" style="background:${t[3]}"></i>${t[1]}</button>`).join(''));
+  $('#otools').onclick=e=>{const b=e.target.closest('[data-t]'); if(!b)return; tool=b.dataset.t; $$('#otools .pal').forEach(x=>x.classList.toggle('on',x===b))};
+  // só o dente clicado é redesenhado: a tela não pula
+  const upd=n=>{const el=$(`.tooth[data-n="${n}"]`); if(el) el.outerHTML=tooth(n)};
+  $('#oarch').onclick=e=>{
+    const t=e.target.closest('.tooth'); if(!t)return; const n=+t.dataset.n; const f=e.target.dataset.f;
+    const d=T[n]||(T[n]={f:{},w:null}); const def=TOOLS.find(x=>x[0]===tool);
+    if(tool==='borracha'){ if(f) delete d.f[f]; else {d.w=null;d.f={}} }
+    else if(def[2]==='f'){ if(!f)return; if(d.f[f]===tool) delete d.f[f]; else d.f[f]=tool }
+    else { d.w=d.w===tool?null:tool }
+    upd(n); plan();
+  };
+  $('#oclr').onclick=()=>{const ks=Object.keys(T); ks.forEach(k=>delete T[k]); Object.keys(SM).forEach(k=>delete SM[k]); ks.forEach(upd); plan()};
+  $('#oex').onclick=()=>{
+    const ks=Object.keys(T); ks.forEach(k=>delete T[k]); Object.keys(SM).forEach(k=>delete SM[k]);
+    const s=(n,f,w)=>T[n]={f:f||{},w:w||null};
+    s(46,{},'canal');s(24,{M:'carie',O:'carie'});s(25,{O:'carie'});s(36,{O:'rest'});s(11,{},'coroa');s(12,{},'ausente');s(38,{},'extrair');s(47,{D:'rest'});
+    new Set([...ks,...Object.keys(T)]).forEach(upd); plan();
+  };
+  function plan(){
+    const it=[];
+    Object.entries(T).forEach(([n,d])=>{
+      const cf=Object.entries(d.f).filter(([f,c])=>c==='carie').map(x=>x[0]);
+      if(d.w==='extrair') it.push([1,`Extração do dente ${n}`,300]);
+      if(d.w==='canal'){it.push([1,`Canal no dente ${n}`,900]);it.push([3,`Coroa sobre o canal do dente ${n}`,1400])}
+      if(cf.length) it.push([2,`Restauração no dente ${n} (${cf.map(f=>FAC[f]).join(', ')})`,180+60*(cf.length-1)]);
+      if(d.w==='coroa') it.push([3,`Coroa no dente ${n}`,1400]);
+      if(d.w==='ausente') it.push([3,`Implante no lugar do dente ${n} (opção)`,3500]);
+    });
+    if(it.length) it.push([4,'Limpeza e revisão',150]);
+    it.sort((a,b)=>a[0]-b[0]);
+    const FASE={1:'Fase 1: urgência (dor e infecção)',2:'Fase 2: restaurar',3:'Fase 3: repor e embelezar',4:'Fase 4: manutenção'};
+    const box=$('#ost');
+    if(!it.length){ set($('#otab'),'<div class="emp">Marque algo no odontograma para gerar o plano.</div>'); box.style.display='none'; $('#onote').textContent=''; return }
+    let last=0,rows='';
+    it.forEach(x=>{
+      if(x[0]!==last){last=x[0];rows+=`<tr><th colspan="3">${FASE[x[0]]}</th></tr>`}
+      const s=SM[x[1]]||0;
+      rows+=`<tr><td>${x[1]}</td><td class="v">${R$(x[2])}</td><td class="v"><button class="st ${CL[s]}" data-k="${x[1]}">${NEXT[s]}</button></td></tr>`;
+    });
+    set($('#otab'),`<table class="pl"><tbody>${rows}</tbody></table>`);
+    const st=x=>SM[x[1]]||0;
+    const tot=it.reduce((a,x)=>a+x[2],0), ap=it.reduce((a,x)=>a+(st(x)>0?x[2]:0),0), parado=it.reduce((a,x)=>a+(st(x)===1?x[2]:0),0);
+    box.style.display='grid';
+    stats(box,[{l:'Orçamento total',v:tot},{l:'Aprovado',v:ap,c:'gold'},{l:'Aprovado e ainda sem iniciar',v:parado,c:'bad'}]);
+    $('#onote').innerHTML='Clique no status de cada item para andar com ele. O dinheiro parado em vinho é o orçamento aprovado que nunca começou: o desperdício silencioso da clínica <span class="s">🟡</span>.';
+  }
+  $('#otab').onclick=e=>{const b=e.target.closest('[data-k]'); if(!b)return; const k=b.dataset.k; SM[k]=((SM[k]||0)+1)%4; plan()};
+  plan();
+};
+
+/* ===== mapa facial ===== */
+const PTS=[['testa','Testa',150,70,'tox'],['glabela','Entre as sobrancelhas',150,112,'tox'],['peD','Pés de galinha D',78,130,'tox'],['peE','Pés de galinha E',222,130,'tox'],['malD','Malar D',92,178,'pre'],['malE','Malar E',208,178,'pre'],['sulD','Sulco do nariz D',120,218,'pre'],['sulE','Sulco do nariz E',180,218,'pre'],['labS','Lábio superior',150,246,'pre'],['labI','Lábio inferior',150,268,'pre'],['marD','Marionete D',112,282,'pre'],['marE','Marionete E',188,282,'pre'],['queixo','Queixo',150,312,'pre'],['manD','Mandíbula D',70,262,'pre'],['manE','Mandíbula E',230,262,'pre']];
+const CHK=['Anamnese assinada','Termo de consentimento assinado','Fotos de antes (mesma luz e ângulo)','Lote e validade do produto conferidos','Rosto marcado com lápis','Orientações entregues'];
+INIT.facial=()=>{
+  const REG={}; let cur=null;
+  const svg=$('#fsvg');
+  set(svg,`<defs><radialGradient id="sk" cx="50%" cy="38%" r="75%"><stop offset="0" stop-color="#fbf3e3"/><stop offset="1" stop-color="#e8d6b8"/></radialGradient></defs>
+   <ellipse cx="150" cy="172" rx="102" ry="144" fill="url(#sk)" stroke="#8a8268" stroke-width="2"/>
+   <ellipse cx="46" cy="180" rx="12" ry="26" fill="url(#sk)" stroke="#8a8268" stroke-width="2"/><ellipse cx="254" cy="180" rx="12" ry="26" fill="url(#sk)" stroke="#8a8268" stroke-width="2"/>
+   <path d="M95 118q22-14 42 0M163 118q22-14 42 0" fill="none" stroke="#8a8268" stroke-width="2.5" stroke-linecap="round"/>
+   <circle cx="116" cy="136" r="7" fill="#8a8268"/><circle cx="184" cy="136" r="7" fill="#8a8268"/>
+   <path d="M150 140v62q-14 6-18 0M150 202q14 6 18 0" fill="none" stroke="#8a8268" stroke-width="2.5" stroke-linecap="round"/>
+   <path d="M120 250q30 14 60 0q-30 8-60 0" fill="none" stroke="#8a8268" stroke-width="2.5" stroke-linecap="round"/>
+   ${PTS.map(p=>`<g class="pt" data-id="${p[0]}"><circle class="ring" cx="${p[2]}" cy="${p[3]}" r="9"/><circle class="core" cx="${p[2]}" cy="${p[3]}" r="8"/><text x="${p[2]}" y="${p[3]-15}" text-anchor="middle">${p[1]}</text></g>`).join('')}`);
+  const paint=()=>$$('.pt',svg).forEach(g=>{g.classList.toggle('on',g.dataset.id===cur);g.classList.toggle('done',!!REG[g.dataset.id])});
+  const panel=()=>{
+    const p=PTS.find(x=>x[0]===cur); const r=REG[cur]||{};
+    set($('#fpanel'),`<div class="swap"><h3>${p[1]}</h3>
+     <p class="muted">Em geral: ${p[4]==='tox'?'toxina, para ruga de expressão':'preenchimento ou bioestimulador, para volume e contorno'} <span class="s">🟡</span></p>
+     <div class="grid"><label>Produto<select id="fp"><option>Toxina botulínica</option><option>Ácido hialurônico</option><option>Bioestimulador</option><option>Fio de PDO</option></select></label>
+     <label>Dose (exemplo)<input type="number" id="fd" value="${r.d||10}" min="0" step="0.5"></label>
+     <label>Lote<input type="text" id="fl" placeholder="digitar ou ler" value="${r.l||''}"></label></div>
+     <div class="row" style="margin-top:12px"><button class="btn" id="fok">Registrar</button><button class="btn alt" id="fno">Tirar</button></div>
+     <p class="muted" style="margin-top:10px">Quem decide a dose é o profissional. Os números aqui são só para ilustrar o registro.</p></div>`);
+    if(r.p) $('#fp').value=r.p;
+    $('#fok').onclick=()=>{REG[cur]={p:$('#fp').value,d:$('#fd').value,l:$('#fl').value};paint();rec()};
+    $('#fno').onclick=()=>{delete REG[cur];paint();rec()};
+  };
+  const rec=()=>{
+    const ks=Object.keys(REG);
+    if(!ks.length){set($('#frec'),'<p class="muted">Nada registrado ainda.</p>');return}
+    set($('#frec'),`<table class="pl"><thead><tr><th>Local</th><th>Produto</th><th>Dose</th><th>Lote</th></tr></thead><tbody>${ks.map(k=>`<tr><td>${PTS.find(x=>x[0]===k)[1]}</td><td>${REG[k].p}</td><td>${REG[k].d}</td><td>${REG[k].l||'<span style="color:var(--vinho)">sem lote</span>'}</td></tr>`).join('')}</tbody></table>
+      <p class="muted" style="margin-top:8px">Também entram: data, nome do profissional e o registro dele no conselho, e a validade do lote, que vem do estoque.</p>`);
+  };
+  svg.addEventListener('click',e=>{const g=e.target.closest('.pt'); if(!g)return; cur=g.dataset.id; paint(); panel()});
+  const cc=()=>{const n=$$('#fchk input:checked').length; $('#fchkn').textContent=`${n} de ${CHK.length}`};
+  set($('#fchk'),CHK.map(c=>`<label class="chk"><input type="checkbox"> ${c}</label>`).join('')+'<p class="muted" style="margin-top:8px"><b id="fchkn">0 de 6</b> conferidos</p>');
+  $('#fchk').onchange=cc;
+};
+
+/* ===== tipos de clínica ===== */
+const TIPOS={
+estetica:[
+{n:'Toxina (botox)',r:[0,.5,5,10],rl:'a cada 4 a 6 meses',o:'Injeção que relaxa o músculo e suaviza ruga de expressão.',f:'Rápido, muitas vezes no mesmo dia da avaliação. Retoque em 10 a 15 dias, se precisar. O efeito dura de 3 a 6 meses, então a pessoa volta sempre.',p:'Anamnese, mapa facial com os pontos, unidades aplicadas, lote e validade, fotos, termo.',c:'R$ 800 a R$ 2.500 por área (preço de referência de guia da internet). Pago no dia ou parcelado.',d:'Esquecer de chamar quem está na hora de voltar. É o motor da recorrência e vaza em silêncio.',s:'Régua de retorno automática, lote baixado do estoque na hora, mapa e unidades no prontuário.',x:'📚'},
+{n:'Preenchimento (hialurônico)',r:[0,.5,12],rl:'de meses a mais de 1 ano',o:'Gel que devolve volume ou contorno (lábio, sulco, mandíbula).',f:'Mais planejamento, mais fotos, rosto marcado com lápis, mais risco. Pode haver retoque em 10 a 15 dias.',p:'Mapa facial, produto, volume, lote, fotos padronizadas, termo.',c:'R$ 1.500 a R$ 3.000 por seringa (referência).',d:'Complicação rara mas séria: sem prontuário completo, a clínica fica sem defesa.',s:'Ficha com mapa facial e rastreio do lote.',x:'📚'},
+{n:'Bioestimulador',r:[0,1,2],rl:'3 sessões espaçadas, efeito de cerca de 1 ano e meio',o:'Injeção que faz o corpo produzir o próprio colágeno. O resultado melhora cerca de 30 dias depois.',f:'Várias sessões espaçadas (por exemplo, uma por mês) 🟡. Ticket alto.',p:'Mapa facial, produto, lote, fotos de cada etapa.',c:'Ticket alto (sem número achado) 🔴.',d:'Quem não volta para a segunda sessão perde o resultado e a clínica perde a venda.',s:'Pacote com saldo de sessões e alerta de sessão atrasada.',x:'📚'},
+{n:'Fios de PDO',r:[0,6],rl:'efeito de cerca de 6 meses',o:'Fios finos colocados sob a pele que dão sustentação e estimulam colágeno.',f:'Procedimento mais técnico, com pós mais cuidadoso. É o único com efeito de lifting imediato.',p:'Mapa dos fios, material, lote, termo, orientações de pós.',c:'Não achamos preço confiável 🔴.',d:'Pós-procedimento com dúvida sem canal para perguntar.',s:'Mensagem de pós e retorno de revisão.',x:'📚'},
+{n:'Laser e depilação',r:[0,1.3,2.6,3.9,5.2,6.5,7.8],rl:'6 a 8 sessões, a cada 30 a 45 dias',o:'Aparelhos que atuam na pele. A depilação a laser é o pacote clássico.',f:'Pacote de sessões em série, pago adiantado ou parcelado. O equipamento é caro.',p:'Fotos da área, fototipo, parâmetros do aparelho a cada sessão, termo.',c:'Pacote parcelado.',d:'Controle de quantas sessões já foram usadas, e quem para no meio do pacote.',s:'Saldo de sessões e agendamento em série.',x:'📚'},
+{n:'Estética corporal',r:[0,1,2,3,4,5],rl:'pacote de sessões',o:'Modelagem, celulite, gordura localizada, com aparelhos, massagens ou injetáveis.',f:'Também por pacote de sessões, com medidas e fotos do corpo 🟡.',p:'Medidas, fotos do corpo, protocolo de cada sessão.',c:'Pacote.',d:'Resultado sem registro objetivo vira discussão.',s:'Medidas e fotos comparadas a cada sessão.',x:'🟡'},
+{n:'Facial não injetável',r:[0,1,2,3,4,5,6,7,8,9,10,11],rl:'mensal ou a cada poucas semanas',o:'Limpeza de pele e peeling, cuidado de superfície feito por esteta ou profissional de saúde.',f:'Mais simples, ticket menor, frequência maior: bom para criar hábito e fidelizar.',p:'Tipo de pele, produtos usados, fotos de acompanhamento.',c:'Ticket menor, frequência alta.',d:'Quem não volta no mês seguinte esfria.',s:'Retorno mensal automático e plano de manutenção.',x:'🟡'}
+],
+odonto:[
+{n:'Clínica geral',r:[0,.5,1,6,12],rl:'revisão de 6 em 6 meses',o:'Cuida da boca inteira: limpeza, restauração, extração simples, prevenção, e encaminha o caso difícil.',f:'Revisão e limpeza a cada 6 meses, ou a pessoa aparece com dor. Os tratamentos saem em 1 a 4 consultas, com 1 a 3 semanas entre elas.',p:'Odontograma, anamnese, plano de tratamento por dente e histórico. É o prontuário base: as outras especialidades acrescentam campos a ele.',c:'R$ 150 a R$ 1.500 por atendimento 🟡. Pago no dia ou parcelado no cartão.',d:'Agenda com buraco, orçamento aprovado que não vira tratamento e inadimplência pequena e espalhada.',s:'Odontograma que funciona, orçamento que vira agenda, lembrete de retorno semestral e convênio.',x:'🟡'},
+{n:'Ortodontia (aparelho)',r:[0,1,2,3,4,5,6,7,8,9,10,11],rl:'manutenção mensal por 2 a 3 anos',o:'Alinha dentes e mordida, com aparelho fixo, autoligável ou alinhador transparente.',f:'Documentação inicial (fotos, raio X, moldagem ou escaneamento), instalação e manutenção mensal. O autoligável pode espaçar para cerca de 3 meses. Contrato de 24 a 36 meses 📚.',p:'Ficha de cada manutenção (fio, elástico, próxima ação), tempo de tratamento e contenção depois.',c:'Colocação de R$ 1.000 a R$ 7.000, mais R$ 100 a R$ 300 por mês 📚. Contrato com entrada e mensalidade.',d:'Quem some no meio do contrato, mensalidade atrasada, e multa por quebrar o contrato ou cobrança durante pausa, que viram briga 📚.',s:'Contrato com parcelas ligado à agenda de manutenção, aviso quando falta ao mês e cobrança recorrente.',x:'📚'},
+{n:'Implantodontia',r:[0,1,4,5,6,8,12],rl:'várias consultas em 4 a 9 meses, depois revisão anual',o:'Repõe dente perdido com um parafuso de titânio no osso e uma coroa em cima.',f:'Avaliação com tomografia, cirurgia, espera de 3 a 6 meses para o osso pegar (osseointegração) 📚, às vezes uma segunda cirurgia, e a prótese. 5 a 8 consultas.',p:'Tomografia anexada, ficha de cada implante (marca, tamanho, posição, lote, torque), termo cirúrgico, receitas de pós.',c:'R$ 3.000 a R$ 30.000 ou mais 🟡. Entrada e parcelas por fase.',d:'Orçamento caro que fica parado, estoque de implantes de várias marcas, e a pessoa que some na espera dos meses.',s:'Orçamento por fases com status, rastreio de lote, lembrete na janela da osseointegração.',x:'🟡'},
+{n:'Endodontia (canal)',r:[0,.25,.5],rl:'1 a 3 sessões, sem retorno regular',o:'Trata a polpa do dente, o chamado nervo: o tratamento de canal.',f:'Em geral a pessoa vem encaminhada por outro dentista, com dor, e fecha em 1 a 3 sessões. Depois volta a quem indicou.',p:'Ficha por dente com raio X antes, durante e depois; medida de cada canal; relatório de volta para quem indicou.',c:'R$ 500 a R$ 2.500 por dente 🟡.',d:'Depende de indicação de outros dentistas, e a urgência desorganiza a agenda.',s:'Cadastro de quem indica, relatório de volta, imagens por dente e encaixe de urgência.',x:'🟡'},
+{n:'Periodontia (gengiva)',r:[0,.5,1,3,6,9,12],rl:'manutenção a cada 3 meses',o:'Trata a gengiva e o osso que sustentam o dente (gengivite, periodontite).',f:'Tratamento ativo em várias sessões e depois manutenção, em geral a cada 3 meses 📚.',p:'Periograma: medida da profundidade de cada bolsa ao redor do dente (6 pontos por dente), placa e sangramento, comparados a cada visita.',c:'Tratamento de R$ 800 a R$ 5.000; manutenção de R$ 200 a R$ 500 🟡.',d:'A pessoa se cura na cabeça, para de voltar e a doença volta. A receita depende do retorno trimestral.',s:'Periograma digital com gráfico de evolução e régua de retorno trimestral.',x:'📚'},
+{n:'Odontopediatria',r:[0,6,12],rl:'revisão de 6 em 6 meses (3 em 3 se risco alto)',o:'Dentes de bebês e crianças, com foco em prevenção e em comportamento.',f:'Sessões curtas, com condicionamento da criança.',p:'Dois cadastros: a criança e o responsável, que assina, paga e decide. Odontograma de dente de leite, hábitos, nível de colaboração.',c:'R$ 100 a R$ 600 por consulta 🟡. Quem paga é o responsável.',d:'Remarcação por criança doente, pais que faltam. Lembrar o responsável, não a criança.',s:'Ficha ligada ao responsável (um responsável com vários filhos), lembrete para o pai ou a mãe.',x:'🟡'},
+{n:'Prótese e reabilitação',r:[0,.5,1,1.5,2,2.5,6,12],rl:'4 a 8 consultas em meses, depois revisão semestral',o:'Refaz dentes e mordida com coroas, pontes e próteses removíveis.',f:'Planejamento, preparo do dente, moldagem ou escaneamento, prova, ajuste e cimentação. O laboratório faz a peça entre uma consulta e outra.',p:'Ordem de serviço do laboratório (dente, material, cor, data de entrega), fotos e registro de mordida, fase de cada trabalho.',c:'R$ 2.000 a R$ 60.000 🟡. Entrada e parcelas por fase.',d:'Prazo do laboratório, peça que volta com erro (refação) e custo do laboratório mal controlado.',s:'Ordem de serviço digital, status da peça (enviado, chegou, provado), custo do laboratório por caso.',x:'📚'},
+{n:'Estética dental (lentes)',r:[0,.5,1,12],rl:'poucas consultas, manutenção anual',o:'Melhora cor, formato e tamanho dos dentes: clareamento, lentes, facetas.',f:'Avaliação, simulação (mock-up) que a pessoa aprova antes de qualquer dente ser lixado, preparo, prova e cimentação. Clareamento é mais curto 📚.',p:'Foto padronizada de antes e depois, registro de cor, simulação aprovada e termo. A foto é o documento do trabalho.',c:'Lentes de R$ 3.000 a R$ 9.000 por dente 📚 (matéria jornalística); clareamento de R$ 800 a R$ 2.500 🟡.',d:'Quem quer só o orçamento e some; expectativa de resultado e briga por insatisfação.',s:'Galeria de antes e depois, orçamento visual por dente e retomada automática de quem não fechou.',x:'🟡'},
+{n:'Cirurgia bucomaxilofacial',r:[0,.25,.5,1],rl:'cirurgia e 2 a 4 retornos',o:'Opera boca, mandíbula e face: dente incluso (siso), cisto, trauma, cirurgia ortognática.',f:'Avaliação com exames, cirurgia (consultório, centro cirúrgico ou hospital) e retornos de pós, como retirada de ponto.',p:'Exames de imagem e de sangue, liberação médica, descrição cirúrgica, prescrição e orientações, complicações.',c:'R$ 500 a R$ 15.000 por cirurgia, mais na ortognática 🟡.',d:'Sala e equipe ocupadas, pós-operatório com gente aflita ligando fora de hora, risco jurídico.',s:'Termos assinados digitalmente, anexo de exames, lembrete de pós e controle de esterilização.',x:'🟡'},
+{n:'Radiologia',r:[0],rl:'sem retorno: é serviço de apoio',o:'Faz os exames de imagem: panorâmica, tomografia, radiografias, escaneamento.',f:'A pessoa chega encaminhada por outro dentista, faz o exame numa visita e vai embora. O laudo sai depois.',p:'Pedido de quem encaminhou, imagens (arquivos pesados), laudo e histórico de exposição.',c:'R$ 80 a R$ 800 por exame 🟡. Dentista parceiro pode ter preço combinado.',d:'Depender de quem encaminha, laudo rápido e arquivos grandes.',s:'Cadastro de quem encaminha, imagem enviada por link seguro, cobrança por lote.',x:'🟡'},
+{n:'Harmonização orofacial (HOF)',r:[0,.5,5,10],rl:'15 dias, depois de 4 a 6 em 4 a 6 meses',o:'Dentista que aplica toxina e preenchedores no rosto. É o mesmo ritmo e o mesmo prontuário da estética.',f:'Avaliação, aplicação, retorno em cerca de 15 dias e manutenção a cada 4 a 6 meses.',p:'Mapa do rosto, produto, lote e validade, fotos, consentimento. Igual ao da estética.',c:'R$ 800 a R$ 6.000 por sessão 🟡.',d:'A base legal está em disputa: o CFO reconheceu a especialidade em 2019 e o TRF1 declarou a resolução ilegal 📚. Conferir o andamento antes de vender para esse público.',s:'O mesmo da estética, mais um aviso jurídico que se atualiza.',x:'📚'},
+{n:'Sono, DTM e dor orofacial',r:[0,.5,1,2,3,6],rl:'retornos de semanas a meses',o:'Dor na articulação da mandíbula, ranger de dentes (bruxismo), ronco e apneia, com aparelho oral.',f:'Diagnóstico, placa ou aparelho feito em laboratório e retornos de ajuste. Para apneia, a polissonografia é feita por médico 📚.',p:'Protocolo de DTM, escala de dor a cada visita, registro de mordida, laudo do médico do sono.',c:'Placa de R$ 600 a R$ 3.000; aparelho de apneia mais caro 🟡.',d:'Caso crônico que dura meses, trabalho em conjunto com médico e fisioterapeuta, e quem não usa a placa.',s:'Escala de dor registrada com gráfico, laudo compartilhado, lembrete de uso e retorno.',x:'📚'},
+{n:'Idosos e pacientes especiais',r:[0,.5,1,2,3,4,5,6],rl:'visitas frequentes e curtas',o:'Atende idosos frágeis e pessoas com deficiência, doença sistêmica ou necessidade especial.',f:'Consultas mais longas e frequentes, às vezes com acompanhante, em domicílio ou instituição, ou sob sedação.',p:'Anamnese ampla, contato do cuidador e do responsável legal, comportamento, liberação médica.',c:'Varia muito. Quem decide e paga costuma ser filho ou cuidador 🟡.',d:'Tempo de cadeira, dependência do acompanhante, falta por problema de saúde e cobrança difícil.',s:'Ficha com vários contatos (paciente, cuidador, financeiro), aviso de medicação, agenda com tempo estendido.',x:'🟡'},
+{n:'Clínica popular e rede',r:[0,1,6,12],rl:'alto volume, retorno por tratamento',o:'Odontologia de volume e preço acessível, em rede, com padronização.',f:'Atendimento rápido, por etapas, passando por vários dentistas na mesma rede. A meta citada é cerca de 2.000 pacientes por mês por unidade 📚.',p:'Prontuário padronizado e único entre unidades, plano de tratamento com preço de tabela da rede.',c:'Ticket em torno de R$ 100 na popular e até R$ 7.000 na de alto padrão (dados das franqueadoras) 📚. Carnê, cartão da rede e plano próprio.',d:'Rotatividade de dentistas, inadimplência no carnê, comissão por dentista e meta por unidade.',s:'Visão de várias unidades, comissão e repasse, cobrança de carnê e painel do franqueador.',x:'📚'},
+{n:'Clínica de convênio',r:[0,6,12],rl:'revisão semestral; tratamento por guia',o:'Atende pacientes de planos odontológicos credenciados e recebe da operadora.',f:'Revisão semestral e tratamentos autorizados por guia. O que exige autorização espera a resposta do plano.',p:'Carteirinha e plano de cada paciente, guia de autorização, código do procedimento (tabela TUSS).',c:'A operadora paga por tabela e pode glosar parte da fatura 📚. Valor por procedimento baixo: depende de volume.',d:'Glosa, repasse que atrasa, descredenciamento, e não saber quanto sobra por paciente.',s:'Faturamento por operadora, controle da guia (enviada, autorizada, paga, glosada), recurso de glosa.',x:'📚'}
+]};
+INIT.tipos=()=>{
+  let g='estetica', k=0;
+  const build=()=>{
+    const L=TIPOS[g];
+    set($('#rt'),L.map((t,j)=>{
+      const mn=Math.min(...t.r), mx=Math.max(...t.r);
+      return `<button class="rrow ${j===k?'on':''}" data-k="${j}" aria-label="${t.n}: ${t.rl}"><span class="rl">${t.n}</span><span class="tk">${t.r.length>1?`<i class="ln" style="left:${mn/12*100}%;width:${(mx-mn)/12*100}%"></i>`:''}${t.r.map(m=>`<b style="left:${m/12*100}%;--d:${Math.round(m*45+j*55)}ms"></b>`).join('')}</span></button>`;
+    }).join('')+'<div class="rrow axis"><span></span><span class="ax2"><i>mês 0</i><i>3</i><i>6</i><i>9</i><i>12</i></span></div>');
+    pick(k);
+  };
+  const pick=j=>{
+    k=j; const t=TIPOS[g][j];
+    $$('#rt .rrow[data-k]').forEach(r=>r.classList.toggle('on',+r.dataset.k===j));
+    set($('#rdg'),`<b>${t.n}</b><span class="chip">Ritmo: ${t.rl}</span><span class="chip">${t.r.length} ${t.r.length===1?'visita':'visitas'} em 12 meses</span>`);
+    set($('#tdet'),`<div class="swap"><h3>${t.n} <span class="s">${t.x}</span></h3><p><b>O que é.</b> ${t.o}</p>
+     <div class="two"><div><p><b>Como é o fluxo.</b> ${t.f}</p><p><b>O que o prontuário tem de diferente.</b> ${t.p}</p><p><b>Ticket e cobrança.</b> ${t.c}</p></div>
+     <div><div class="pain"><b>Onde dói</b>${t.d}</div><div class="sys" style="margin-top:12px"><b>O que o sistema precisa</b>${t.s}</div></div></div></div>`);
+  };
+  $('#rt').onclick=e=>{const r=e.target.closest('.rrow[data-k]'); if(r) pick(+r.dataset.k)};
+  $$('#gseg button').forEach(b=>b.onclick=()=>{g=b.dataset.g;k=0;$$('#gseg button').forEach(x=>x.classList.toggle('on',x===b));build()});
+  build();
+};
+
+/* ===== convênio ===== */
+const CONV=[['1. Guia','Formulário em que a clínica diz: fiz tal procedimento, no paciente tal, no dente tal. Segue o padrão nacional TISS, da ANS 📚.'],['2. Código (TUSS)','Cada procedimento tem um número na tabela. A guia precisa ter o código certo 📚.'],['3. Autorização','Alguns procedimentos precisam de aprovação antes (canal, prótese, cirurgia). O plano devolve uma senha ou número 📚. Varia por operadora 🔴.'],['4. Envio da cobrança','Em geral por mês, em arquivo XML ou pelo portal. Cada plano tem sua janela, e perder o prazo gera glosa 📚.'],['5. Resposta do plano','O plano aceita ou recusa itens. Recusa total ou parcial é a glosa 📚. A clínica pode recorrer com justificativa 🟡.'],['6. Repasse','O plano deposita o que aceitou, semanas depois do envio 🟡. A clínica ainda repassa parte ao dentista 🟡.']];
+INIT.convenio=()=>{
+  set($('#cflow'),CONV.map((c,k)=>`<div class="card flowc cs" data-k="${k}"><div class="n">${k+1}</div><h3 style="font-size:19px;margin-top:6px">${c[0].replace(/^\d+\.\s*/,'')}</h3><p style="margin:0">${c[1]}</p></div>`).join(''));
+  stagger('#cflow > .card');
+  let t=null;
+  const cs=$$('.cs');
+  $('#cplay').onclick=()=>{ clearInterval(t); let k=0; const step=()=>{cs.forEach((c,j)=>c.classList.toggle('hi',j===k)); if(++k>cs.length){clearInterval(t);cs.forEach(c=>c.classList.remove('hi'))}}; step(); t=setInterval(step,1700)};
+  $('#cglosa').onclick=()=>{const g=$('#cgl'); const abre=g.style.display==='none'; g.style.display=abre?'block':'none'; if(abre) g.classList.add('swap')};
+};
+
+/* ===== dia de cada papel ===== */
+const RECEP=[['7h30','Chega, abre o computador, vê a agenda do dia e quem tem retorno.','Se a agenda está em papel ou planilha, não vê que dois pacientes caíram no mesmo horário.'],['8h','Manda a confirmação de quem ainda não respondeu, um por um, no WhatsApp.','Quem não confirma e não é lembrado vira falta.'],['8h30','Recebe a primeira pessoa, confere cadastro, pede assinatura de ficha ou termo.','Ficha de papel perdida, sem consentimento assinado.'],['Manhã','Atende telefone e WhatsApp ao mesmo tempo: orçamento, preço, tem horário amanhã?','Quem pergunta preço às 10h e fica sem resposta até as 14h compra de outra clínica.'],['10h','Alguém faltou: tenta encaixar alguém da fila de espera.','Sem fila organizada, o horário fica vazio e a hora do profissional é perdida.'],['12h','Procedimento termina: cobra, parcela no cartão, passa Pix, emite recibo.','Desconto de boca, parcela esquecida, pagamento sem registro.'],['Tarde','Remarca quem pediu, liga para quem tinha orçamento em aberto, cobra quem deve.','Orçamento sem acompanhamento é venda perdida; cobrança esquecida é inadimplência.'],['17h','Avisa o profissional do dia seguinte e confere materiais que acabaram.','Falta de material no meio do procedimento.'],['18h30','Fecha o caixa: soma dinheiro, cartão e Pix e compara com o que foi vendido.','Diferença de caixa que ninguém sabe explicar.']];
+const PAPEIS={
+ prof:['Profissional (dentista, biomédico, esteta)',[['Antes dos pacientes','Vê a agenda e lê o prontuário de quem vem.'],['No atendimento','Anamnese, exame, fotos, explicação, aplicação ou procedimento. Entre uma pessoa e outra tem poucos minutos, então tela lenta atrapalha.'],['Depois de cada pessoa','Escreve a evolução (muitas vezes digitando rápido, e falta detalhe), registra produto, lote e dose.'],['No fim do dia','Responde dúvida de pós. Quer saber: quanto produzi, quanto tenho a receber, o que já foi pago.']]],
+ dona:['Dona ou gestora',[['De manhã','Olha faturamento, agenda cheia ou vazia, quem faltou.'],['Durante o dia','Atende, se for também profissional. Compra produto e controla estoque (decisão de dinheiro alto). Cuida de equipe, marketing, Instagram e da vigilância sanitária.'],['No fim','Quer saber: quem não volta há mais de 6 meses? Qual procedimento dá mais lucro? Quantas faltas esta semana? Em convênio, acompanha glosa e repasse.'],['Os 8 números que ela devia ver','Faturamento do mês, ticket médio, taxa de comparecimento, conversão de orçamento, ocupação da agenda, inadimplência, retorno de pacientes, origem dos pacientes 🟡.']]],
+ asb:['Auxiliar e técnico em saúde bucal (odontologia)',[['Antes','Prepara a sala: esteriliza, monta a bandeja, troca as barreiras.'],['No atendimento','Recebe a pessoa na cadeira, faz a anamnese e anota o odontograma enquanto o dentista fala. Passa os instrumentos e aspira.'],['No fim','Desmonta, esteriliza e repõe material. O técnico (TSB) ainda faz limpeza e aplica flúor sob orientação. Regulados pela lei 11.889/2008 📚.']]]
+};
+INIT.dia=()=>{
+  const roles=[['recep','Recepção'],['prof','Profissional'],['dona','Dona ou gestora'],['asb','Auxiliar (odonto)']];
+  let cur='recep';
+  set($('#prole'),roles.map(r=>`<button class="btn ${r[0]===cur?'on':'alt'}" data-r="${r[0]}">${r[1]}</button>`).join(''));
+  const draw=()=>{
+    if(cur==='recep'){
+      set($('#pdia'),`<div class="card"><h3>Arraste o relógio</h3><input type="range" id="rg" min="0" max="${RECEP.length-1}" value="0"><div class="row" style="justify-content:space-between" id="rgl"></div><div id="rgd"></div></div>
+       <div class="warn"><b>Exemplo.</b> Segunda, 8h: 14 pacientes marcados, 14 mensagens de confirmação uma a uma. Seis respondem, quatro visualizam e não respondem, quatro nem abrem. Às 10h, dois faltam. Se cada hora vale R$ 300, foram R$ 600 perdidos antes do almoço, sem ninguém errar. Estimativa de 80 a 150 microtarefas por dia 🟡.</div>`);
+      set($('#rgl'),RECEP.map(r=>`<span class="muted">${r[0]}</span>`).join(''));
+      const u=()=>{const r=RECEP[+$('#rg').value]; set($('#rgd'),`<div class="swap" style="min-height:170px"><h3 style="margin-top:14px;color:var(--ouro);font-size:34px">${r[0]}</h3><p class="jbody" style="margin-bottom:12px">${r[1]}</p><div class="pain"><b>Onde o dinheiro escapa</b>${r[2]}</div></div>`)};
+      $('#rg').oninput=u; u();
+    } else {
+      const p=PAPEIS[cur];
+      set($('#pdia'),`<div class="card swap"><h3>${p[0]}</h3>${p[1].map(x=>`<p><b>${x[0]}.</b> ${x[1]}</p>`).join('')}</div>`);
+    }
+  };
+  $('#prole').onclick=e=>{const b=e.target.closest('[data-r]'); if(!b)return; cur=b.dataset.r; $$('#prole .btn').forEach(x=>x.className='btn '+(x===b?'on':'alt')); draw()};
+  draw();
+};
+
+/* ===== dinheiro ===== */
+const ERROS=['Não confirmar a consulta, ou confirmar à mão e esquecer.','Não ter lista de espera: cancelou, o horário morreu.','Demorar a responder o lead.','Orçamento sem acompanhamento.','Misturar o dinheiro da clínica com o da dona.','Não ver o valor líquido do cartão.','Não controlar inadimplência (parcela, carnê, sessão feita e não paga).','Precificar sem conhecer o custo da hora, do produto e da taxa.','Estoque sem lote e sem validade.','Comissão calculada à mão, em planilha, e nenhum indicador olhado.'];
+INIT.dinheiro=()=>{
+  const v=id=>+$('#'+id).value||0;
+  const f=()=>{
+    const a=v('f1'),h=v('f2'),s=v('f3')/100,c=v('f4')/100,d=v('f5');
+    const sem=a*s*h*d, com=a*c*h*d;
+    stats($('#fout'),[{l:'Perda por mês, sem lembrete',v:sem,c:'bad'},{l:'Perda por mês, com lembrete',v:com},{l:'Diferença por ano',v:(sem-com)*12,c:'gold'}]);
+  };
+  const c=()=>{
+    const b=v('c1'),t=v('c2')/100,p=Math.max(1,v('c3')),an=v('c4')/100;
+    const liq=b*(1-t), antec=b*(1-t)*an*(p+1)/2;
+    stats($('#cout'),[{l:'Venda',v:b},{l:'Depois da taxa da máquina',v:liq},{l:'Custo extra de antecipar (aprox.)',v:antec,c:'bad'},{l:'Entra, de fato, antecipando',v:liq-antec,c:'gold'}]);
+  };
+  ['f1','f2','f3','f4','f5'].forEach(i=>$('#'+i).oninput=f);['c1','c2','c3','c4'].forEach(i=>$('#'+i).oninput=c);
+  f();c();
+  const E=['Entrada: o frasco chega com lote e validade','Baixa no estoque quando o procedimento é registrado','O lote é gravado no prontuário de cada pessoa','Alerta de produto perto de vencer','Se a Anvisa avisar de um lote ruim: achar na hora quem recebeu'];
+  set($('#est'),E.map((x,i)=>`<div class="card flowc" style="flex:1 1 150px"><div class="n">${i+1}</div>${x}</div>`).join(''));
+  stagger('#est > .card');
+  set($('#erros'),ERROS.map(e=>`<li>${e}</li>`).join(''));
+};
+
+/* ===== quem pode ===== */
+const QUEM=[['Médico (CFM)','Pode tudo na estética médica, incluindo injetáveis, lasers e procedimentos mais invasivos. Cirurgião plástico e dermatologista são os mais comuns.','🟡',0],['Dentista (HOF)','O CFO reconheceu a harmonização orofacial como especialidade em 2019 (Resolução 198). Em agosto de 2026 o TRF-1 considerou essa resolução ilegal, em ação do CFM e da SBD. O CFO vai recorrer e orientou os dentistas a manterem as atividades enquanto a Justiça decide.','📚',1],['Biomédico esteta (CFBM)','A resolução 241/2014 permite procedimentos minimamente invasivos, como toxina e preenchedores. O TRF-1 manteve a sentença que anulou essa resolução, em ação do CFM. O CFBM segue publicando cartilha dizendo que o biomédico habilitado pode usar toxina e preenchedores, apoiado em outras normas.','📚',1],['Enfermeiro','Não achamos a posição do Cofen. Na prática atua muito em estética, com protocolos e, em alguns casos, sob orientação de médico.','🔴',1],['Esteta (técnico)','Faz procedimentos não invasivos e de superfície: limpeza de pele, peeling superficial, massagens, depilação, alguns aparelhos. Não injeta.','🟡',0],['Farmacêutico esteta','Existe e atua com habilitação própria, com limites também discutidos. Não pesquisamos a fundo.','🟡',1]];
+INIT.quem=()=>{
+  set($('#qgrid'),QUEM.map(q=>`<div class="card"><h3 style="font-size:20px">${q[0]} <span class="s">${q[2]}</span></h3>${q[3]?'<span class="tag t-fa">em disputa</span>':''}<p style="margin-top:8px">${q[1]}</p></div>`).join(''));
+  stagger('#qgrid > .card');
+};
+
+/* ===== Attlas cobre? ===== */
+const A=[
+['Ficha única do paciente (Resumo, Prontuário, Fotos, Documentos, Conversa, Linha do tempo)','ok','Pacientes. Do anúncio ao caixa, numa ficha só.'],
+['Anamnese com alerta vermelho no topo da ficha','ok','Clínica > Modelos e aba Prontuário.'],
+['Termo de consentimento e link do paciente (anamnese e termo pelo celular)','ok','Link /p/código, fora do sistema da clínica.'],
+['Odontograma','ok','Aba Odontograma do atendimento e da ficha.'],
+['Mapa facial e escalas da ficha facial','ok','Aba Mapa facial e aba Facial do atendimento.'],
+['Lote e validade, com baixa pelo mapa facial ao finalizar','ok','Estoque > Lotes e validade.'],
+['Lead vira paciente no primeiro agendamento','ok','Comercial > Leads e Pacientes.'],
+['Agenda, Atender e Cobrar pelo cartão da Agenda','ok','Agenda.'],
+['A receber, A pagar, Lançamentos, Contas e bancos, DRE','ok','Financeiro. Formas de pagamento em Clínica > Pagamento.'],
+['Fila de espera, sala e previsão de falta','pl','Entram dentro da Agenda (Onda 2).'],
+['Orçamentos com status','pl','Comercial > Orçamentos (frente do financeiro).'],
+['Pacotes com saldo de sessões','pl','Clínica > Pacotes (Onda 2).'],
+['Caixa, comissões, notas fiscais, fechamento do mês','pl','Financeiro (Onda 2).'],
+['Valor líquido do cartão (taxas)','pl','Clínica > Pagamento, taxas (Onda 2).'],
+['Agendamento online','pl','Clínica > Funcionamento (Onda 2).'],
+['Lembretes e régua de retorno automática','pl','Clínica > Lembretes e Automações; a IA fica com o follow-up e o retorno.'],
+['App do paciente: confirmar, assinar, pagar, avaliar, indicar','pl','Link do paciente, fora do sistema.'],
+['Origem dos pacientes, avaliações no Google','pl','Marketing (Ondas 2 e 3).'],
+['Laboratório de prótese (ordem de serviço, status da peça)','pl','Estoque > Laboratório, só com o odontograma.'],
+['Convênio odontológico: guia TISS, TUSS, autorização, glosa, repasse','fa','Não aparece no mapa. É um motor inteiro da odontologia.'],
+['Periograma (periodontia)','fa','Não aparece no mapa.'],
+['Ficha de manutenção da ortodontia e contrato mensal ligado à agenda','fa','Não aparece no mapa.'],
+['Ficha de implante (marca, tamanho, torque, lote)','cf','Lote existe no Estoque; a ficha específica não está no mapa.'],
+['Responsável legal e vários filhos na mesma conta (odontopediatria)','fa','Não aparece no mapa.'],
+['Cadastro de quem indica e relatório de volta (endodontia e radiologia)','fa','Não aparece no mapa.'],
+['Várias unidades (rede e franquia)','fa','Não aparece no mapa.'],
+['Registro do conselho do profissional em cada procedimento','cf','Conferir se a ficha grava CRM, CRO, CRBM ou COREN.'],
+['Prontuário que nunca se apaga e que guarda quem mexeu e quando','cf','Conferir com a sessão do prontuário e da lei.'],
+['Sinal ou depósito na hora de marcar, para reduzir a falta','fa','Não aparece no mapa.'],
+['Aviso jurídico atualizável para a harmonização orofacial','fa','Não aparece no mapa.']
+];
+const AT={ok:['t-ok','Existe'],pl:['t-pl','Planejado'],fa:['t-fa','Falta'],cf:['t-cf','Conferir']};
+INIT.attlas=()=>{
+  let f='todos';
+  const draw=()=>{
+    set($('#atb'),A.filter(a=>f==='todos'||a[1]===f).map(a=>`<tr><td>${a[0]}</td><td><span class="tag ${AT[a[1]][0]}">${AT[a[1]][1]}</span></td><td class="muted">${a[2]}</td></tr>`).join(''));
+    set($('#afil'),[['todos','Tudo ('+A.length+')'],...Object.entries(AT).map(([k,v])=>[k,v[1]+' ('+A.filter(a=>a[1]===k).length+')'])].map(b=>`<button class="btn ${b[0]===f?'on':'alt'}" data-f="${b[0]}">${b[1]}</button>`).join(''));
+  };
+  $('#afil').onclick=e=>{const b=e.target.closest('[data-f]'); if(b){f=b.dataset.f;draw()}};
+  draw();
+};
+
+/* ===== glossário ===== */
+const GL=[['Anamnese','Entrevista de saúde feita antes de qualquer procedimento.'],['Prontuário','Pasta oficial do paciente, com tudo que foi feito e assinado.'],['Evolução','Registro de cada atendimento dentro do prontuário.'],['Termo de consentimento','Documento em que a pessoa declara que entendeu os riscos e autoriza o procedimento.'],['Mapa facial','Desenho de rosto em que se marcam os pontos de aplicação.'],['Odontograma','Mapa dos dentes com o estado de cada um.'],['FDI','Sistema de numeração dos dentes com dois dígitos.'],['Face (do dente)','Cada lado: vestibular, lingual ou palatina, oclusal ou incisal, mesial, distal.'],['Oclusal / incisal','A face de mastigar / a ponta que corta.'],['Periapical','Raio X de um ou dois dentes, com a raiz.'],['Bite-wing (interproximal)','Raio X que mostra as cáries entre os dentes.'],['Panorâmica','Raio X de toda a boca numa só imagem.'],['Tomografia','Exame de imagem em 3D.'],['Profilaxia','Limpeza com remoção de tártaro e polimento.'],['Plano de tratamento','O que fazer e em que ordem.'],['Orçamento','Quanto custa cada item do plano e como pagar.'],['Recall','Chamar a pessoa de volta para a revisão ou a limpeza.'],['Coroa','Capa de porcelana ou resina que cobre um dente quebrado.'],['Canal (endodontia)','Tratamento da polpa do dente, o nervo.'],['Implante','Parafuso de titânio no osso que recebe uma coroa.'],['Osseointegração','O osso pegar no implante, de 3 a 6 meses.'],['Periograma','Medida da profundidade das bolsas de gengiva em cada dente.'],['Mock-up','Simulação do resultado que a pessoa aprova antes de lixar dente.'],['Toxina botulínica (botox)','Injeção que relaxa o músculo e suaviza ruga.'],['Preenchedor / ácido hialurônico','Gel que devolve volume ou contorno.'],['Bioestimulador','Injetável que faz o corpo produzir colágeno.'],['Skinbooster','Microinjeções de hidratação profunda da pele.'],['Fios de PDO','Fios absorvíveis que dão sustentação e estimulam colágeno.'],['HOF','Harmonização orofacial, nome usado por dentistas.'],['Lote e validade','Código e data de vencimento do produto, usados para rastrear.'],['Intercorrência','Problema durante ou depois do procedimento: roxo grande, assimetria, reação.'],['Retoque','Pequena correção feita dias depois do procedimento.'],['Pacote','Várias sessões pagas juntas, com desconto.'],['No-show (falta)','Paciente que marca e não aparece, sem avisar.'],['ASB / TSB','Auxiliar e técnico em saúde bucal.'],['CFO, CRO','Conselho Federal e Regional de Odontologia.'],['CFM, CRM','Conselho Federal e Regional de Medicina.'],['CFBM, CRBM','Conselhos de Biomedicina.'],['Cofen, COREN','Conselhos de Enfermagem.'],['Anvisa / vigilância sanitária','Quem fiscaliza a clínica: alvará, limpeza, produtos, documentos.'],['LGPD','Lei que protege dados pessoais; dado de saúde é dado sensível.'],['TISS','Padrão nacional de troca de informação entre clínica e convênio (ANS).'],['TUSS','Tabela de códigos dos procedimentos usada nas guias.'],['Guia','Formulário que a clínica envia ao convênio.'],['Glosa','Recusa do convênio em pagar um item cobrado.'],['Repasse','Dinheiro que o convênio paga à clínica, ou que a clínica passa ao dentista.'],['Ticket médio','Valor médio gasto por paciente.'],['LTV','Quanto a pessoa deixa na clínica ao longo da vida inteira.'],['Comissão','Percentual do que o profissional produziu.'],['Antecipação','Receber de uma vez o cartão parcelado, pagando uma taxa.']];
+const LAC=['Taxa real de falta em clínica de estética e em clínica odontológica particular.','Ticket médio e quantas pessoas voltam em 6 meses.','De cada 10 orçamentos apresentados, quantos viram tratamento.','Prazo de guarda do prontuário para biomédico, enfermeiro e para o eletrônico (texto oficial).','O odontograma é obrigatório por norma ou só por prática?','Regra de rastreabilidade de lote e validade em estética (Anvisa).','Posição do Cofen sobre enfermeiro e injetáveis.','Resultado final das disputas judiciais do dentista e do biomédico.','Quais procedimentos exigem autorização prévia nos convênios mais usados.','Como funciona, na prática, a ortodontia (contrato, pausa, multa), o implante e o convênio: ouvir um dentista de cada.'];
+INIT.glossario=()=>{
+  const draw=q=>set($('#gl'),GL.filter(g=>!q||(g[0]+g[1]).toLowerCase().includes(q)).map(g=>`<div class="card"><b>${g[0]}</b><p style="margin:2px 0 0" class="muted">${g[1]}</p></div>`).join('')||'<p class="muted">Nada encontrado.</p>');
+  $('#gq').oninput=e=>draw(e.target.value.toLowerCase());draw('');
+  set($('#lac'),LAC.map(l=>`<li>${l}</li>`).join(''));
+};
+
+/* ===== partida ===== */
+let first=location.hash.slice(1);
+try{ if(!first) first=localStorage.getItem('clinica-aba')||'' }catch(e){}
+const tab0=TABS.some(t=>t[0]===first)?first:'inicio';
+$$('.panel').forEach(p=>p.classList.remove('on'));
+show(tab0);
+scrollTo(0,0);
+if(document.fonts&&document.fonts.ready) document.fonts.ready.then(ind);
+</script>
+</body>
+</html>
